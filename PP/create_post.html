@@ -1,0 +1,7 @@
+<div class="post_form">
+          <form action="{% url 'profile_page' request.user.id %}" method="post">
+            {% csrf_token %}
+            {{ create_post_form }}
+            <button type="submit" class="btn btn-light">Запостить</button>
+          </form>
+        </div>

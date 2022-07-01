@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+PukPok
+{% endblock %}
+
+{% block content %}
+    <div class="main_container">
+      <div class='last_posts'>
+        <h1>Последние посты</h1>
+      </div>
+      <div class="posts">
+        {% for post in posts %}
+        <div class="post">
+          <div class="whole_post">
+            <div class="profile_pic">
+              <a href="{% url 'profile_page' post.author.profile.id %}">
+                {% if post.author.profile.profile_pic %}
+                <img class="profile_pic" src="{{ post.author.profile.profile_pic.url }}" alt="-">
+                {% else %}
+                <img class="profile_pic" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-">
+                {% endif %}
+              </a>
+            </div>
+            <div class="alert alert-dark">
+              <a href="{% url 'profile_page' post.author.profile.id %}" class="profile_url"><p class="post_author">{{ post.author.username }}</p></a>
+              <p class="post_content">{{ post.content }}</p>
+              <div class="post_info">
+                <div class="post_likes">
+                  <form action="{% url 'like_post' post.pk %}" method="POST" class="likes_info">
+                    {% csrf_token %}
+                    <button type="submit" name="post_id" value="{{ post.id }}" class="like_post">❤</button>
+                    <div class="total_likes">
+                      {{ post.total_likes }}
+                    </div>
+                  </form>
+                </div>
+                <p class="pub_date">{{ post.posted_at|date:"d M в H:i" }}</p>
+              </div>
+              <hr>
+              <p class="p_comments">Комментарии</p>
+              {% if post.comments.all %}
+              {% for comment in post.comments.order_by %}
+              <div class="comments">
+                <div class="whole_comments">
+                  <div class="profile_pic_comments">
+                    <a href="{% url 'profile_page' comment.author.profile.id %}">
+                    {% if comment.author.profile.profile_pic %}
+                    <img class="profile_pic_comments" src="{{ comment.author.profile.profile_pic.url }}" alt="-">
+                    {% else %}
+                    <img class="profile_pic_comments" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-">
+                    {% endif %}
+                    </a>
+                  </div>
+                  <div class="comment">
+                    <a href="{% url 'profile_page' comment.author.profile.id %}" class="profile_url"><p class="comment_author">{{ comment.author.username }}</p></a>
+                    <p class="comment_text">{{ comment.comment_text }}</p>
+                    <div class="comment_info">
+                      <p class="comment_pub_date">{{ comment.comment_posted_at|date:"d M в H:i" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                      <div class="comment_likes">
+                        <form action="{% url 'like_comment' comment.pk %}" class="comment_likes_info" method="POST">
+                        {% csrf_token %}
+                          <button type="submit" name="comment_id" value="{{ comment.id }}" class="like">
+                          ❤
+                          </button>
+                          <div class="comment_total_likes">
+                            {{ comment.total_likes }}
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  
+                  </div>
+                </div>
+                <hr>
+              </div>    
+              {% endfor %}
+              {% else %}
+              <p class="no_comments">Комментариев пока нет!</p>
+              {% endif %}  
+            </div>      
+          </div>
+        </div>
+        {% endfor %}  
+      </div>
+    </div>
+{% endblock %}

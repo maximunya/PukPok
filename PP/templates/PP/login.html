@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %}
+Вход
+{% endblock %}
+
+{% block content %}
+	<div class="login_container">
+    <div class="window_login">
+      <p class="login_sign_in">Вход</p>
+      <form method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <a href="#" class="forget">Забыли пароль?</a>
+        <div class="index_account">
+          <div class="create_account"><a href="{% url 'register' %}" class="btn btn-outline-light">Создать аккаунт</a></div>
+          <div class="log_submit"><button type="submit" class="btn btn-primary">Войти</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
