@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{{ post.content }}
+{% endblock %}
+
+{% block content %}
+<main class="profile_page_main">
+	{% if messages %}
+      <div style="margin: 0 0 -20px 0; padding: 5% 0 0 0;" class="flex">
+        <div style="margin: 0 0 0 7.8%; padding: 0;" class='last_posts1'>
+          <h1>Подробнее</h1>
+        </div>
+        <div style="margin: 0 15% 0 0; padding: 0;" class="message">
+        {% for message in messages %}
+          {% if message.tags == 'error' %}
+          <div class="alert alert-danger pl-0 pr-0 pt-1 pb-1" style="" role="alert">
+            {{ message }}
+          </div>
+          {% else %}
+          <div class="alert alert-success pl-0 pr-0 pt-1 pb-1" style="" role="alert">
+            {{ message }}
+          </div>
+          {% endif %}
+        {% endfor %}
+        </div>
+      </div>
+      {% else %}
+      <div style="margin-top: 0; padding-top: 5%;" class='last_posts'>
+        <h1 style="margin-left: 10px;">Подробнее</h1>
+      </div>
+    {% endif %}
+	<div class="post_detail">
+	  <div class="whole_post">
+	    <div class="profile_pic">
+	      <a href="{% url 'profile_page' post.author.profile.id %}">
+	        {% if post.author.profile.profile_pic %}
+	        <img class="profile_pic" src="{{ post.author.profile.profile_pic.url }}" alt="-">
+	        {% else %}
+	        <img class="profile_pic" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-">
+	        {% endif %}
+	      </a>
+	    </div>
+	    <div class="alert alert-dark" style="padding-left: 25px;">
+	      <div class="flex">
+            <a href="{% url 'profile_page' post.author.profile.id %}" class="profile_url"><p class="post_author">{{ post.author.username }}</p></a>
+            {% if user.is_authenticated %}
+            {% if post.author.id == user.id %}
+            <div class="flex1">
+              {% if post.can_edit %}
+              <a href="{% url 'update_post' post.pk %}" class="post_author"><p class="post_update">Изменить</p></a>
+              {% endif %}
+              <a href="{% url 'delete_post' post.pk %}" class="post_author"><p class="post_delete">Удалить</p></a>
+            </div>
+            {% endif %}
+            {% endif %}
+          </div>
+	      <p class="post_content"><a href="{% url 'post_detail' post.pk %}" class="a_post_detail">{{ post.content|linebreaks }}</a></p>
+	      <div class="post_info">
+	        <div class="post_likes">
+	          <form action="{% url 'like_post' post.pk %}" method="POST" class="likes_info">
+	            {% csrf_token %}
+	            {% if user in post.likes.all %}
+                <button type="submit" name="post_id" value="{{ post.id }}" class="liked_post">❤</button>
+                {% else %}
+                <button type="submit" name="post_id" value="{{ post.id }}" class="like_post">❤</button>
+                {% endif %}
+	            <div class="total_likes">
+	              {{ post.total_likes }}
+	            </div>
+	          </form>
+	        </div>
+	        {% if post.posted_at|date:"d M H:i:s" == post.edited_at|date:"d M H:i:s" %}
+	        <p class="pub_date">{{ post.posted_at|date:" j E в H:i " }}</p>
+	        {% else %}
+	        <p class="pub_date">{{ post.posted_at|date:" j E в H:i " }} (ред.)</p>
+	        {% endif %}
+	      </div>
+	      <br> 
+	      <p class="p_comments">{{ post.comments.count }} {{ post.total_comments }}</p>
+	      <hr> 
+	      {% if post.comments.all %}
+	      {% for comment in post.comments.order_by %}
+	      <div class="comments">
+	        <div class="whole_comments">
+	          <div class="profile_pic_comments">
+	            <a href="{% url 'profile_page' comment.author.profile.id %}">
+	            {% if comment.author.profile.profile_pic %}
+	            <img class="profile_pic_comments" src="{{ comment.author.profile.profile_pic.url }}" alt="-">
+	            {% else %}
+	            <img class="profile_pic_comments" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-">
+	            {% endif %}
+	            </a>
+	          </div>
+	          <div class="comment">
+	            <div class="flex">
+                  <a href="{% url 'profile_page' comment.author.profile.id %}" class="profile_url"><p class="comment_author">{{ comment.author.username }}</p></a>
+                  {% if user.is_authenticated %}
+                  {% if comment.author.id == user.id %}
+                  <div class="flex1">
+                    {% if comment.can_edit %}
+                    <a href="{% url 'update_comment' comment.pk %}" class="post_author"><p class="comment_update">Изменить</p></a>
+                    {% endif %}
+                    <a href="{% url 'delete_comment_profile' post.pk comment.pk %}" class="post_author"><p class="comment_delete">Удалить</p></a>
+                  </div>
+                  {% elif post.author.id == user.id %}
+                  <a href="{% url 'delete_comment_profile' post.pk comment.pk %}" class="post_author"><p class="comment_delete">Удалить</p></a>
+                  {% endif %}
+                  {% endif %}
+                </div>
+                <p class="comment_text">{{ comment.comment_text|linebreaks }}</p>
+                <div class="comment_info">
+                  {% if comment.comment_posted_at|date:"d M H:i:s" == comment.comment_edited_at|date:"d M H:i:s" %}
+                  <p class="comment_pub_date">{{ comment.comment_posted_at|date:"d M в H:i" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                  {% else %}
+                  <p class="comment_pub_date">{{ comment.comment_posted_at|date:"d M в H:i" }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                  {% endif %}
+	              <div class="comment_likes">
+	                <form action="{% url 'like_comment' comment.pk %}" class="comment_likes_info" method="POST">
+	                {% csrf_token %}
+	                {% if user in comment.likes.all %}
+	                  <button type="submit" name="comment_id" value="{{ comment.id }}" class="liked">
+	                      ❤
+	                  </button>
+	                {% else %}
+	                  <button type="submit" name="comment_id" value="{{ comment.id }}" class="like">
+	                      ❤
+	                  </button>
+	                {% endif %}
+	                  <div class="comment_total_likes">
+	                    {{ comment.total_likes }}
+	                  </div>
+	                </form>
+	              </div>
+	            </div>
+	          
+	          </div>
+	        </div>
+	        <hr>
+	      </div>    
+	      {% endfor %}
+	      
+	      {% endif %} 
+	      {% if user.is_authenticated %}
+	      <div class="send_comment">
+	      	<div class="profile_pic_comments">
+	          {% if user.profile.profile_pic %}
+	          <a href="{% url 'profile_page' user.id %}"><img class="profile_pic_comments" src="{{ user.profile.profile_pic.url }}" alt="-"></a>
+	          {% else %}
+	          <a href="{% url 'profile_page' user.id %}"><img class="profile_pic_comments" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-"></a>
+	          {% endif %}
+	        </div>	
+	      	<div class="comment_form">
+			  <form class="comment_form1" action="{% url 'create_comment' %}" method="post">
+			    {% csrf_token %}
+			    {{ create_comment_form }}
+			    <button type="submit" class="btn btn-dark" style="width: 117%; margin-left: 2.5%">Отправить</button>
+			  </form>
+			</div>
+		      <script>
+	            var post = "{{ post.id }}";
+	            document.getElementById("post").value = post;
+	            var author = "{{ user.id }}";
+	            document.getElementById("author").value = author;
+	          </script>
+	      </div>
+	      {% endif %} 
+	    </div>      
+	  </div>
+</main>
+{% endblock %}

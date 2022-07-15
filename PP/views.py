@@ -1,17 +1,45 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post, Comment, Profile
-from .forms import RegisterForm, UserLoginForm, PostForm
+from .forms import RegisterForm, UserLoginForm, PostForm, CommentForm
 from django.contrib.auth import login as auth_login, logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView, CreateView, FormView
+from django.views.generic import DetailView, CreateView, FormView, UpdateView
+from django.views.generic.edit import ModelFormMixin 
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 def index(request):
 	posts = Post.objects.order_by('-posted_at')
 	comments = Comment.objects.order_by('-comment_posted_at')
-	context = {'posts': posts, 'comments': comments,}
+	context = {
+		'posts': posts,
+		'comments': comments,
+		
+	}
 	return render(request, "PP/index.html", context)
+
+
+
+class PostDetailView(DetailView):
+	model = Post
+	template_name = 'PP/post_detail.html'
+	#success_url = reverse('post_detail', kwargs={'pk': self.object.id})
+
+	def get_context_data(self, *args, **kwargs):
+		context = super(PostDetailView, self).get_context_data(*args, **kwargs)
+		post = get_object_or_404(Post, id=self.kwargs['pk'])
+		context['create_comment_form'] = CommentForm()
+		context["post"] = post
+		return context
+
+
+class CreateCommentForm(CreateView):
+	form_class = CommentForm
+	template_name = 'PP/create_comment.html'
+
+
 
 def register(request):
 	if request.method == 'POST':
@@ -19,10 +47,13 @@ def register(request):
 		if form.is_valid():
 			user = form.save()
 			auth_login(request, user)
+			messages.success(request, 'Вы успешно зарегистрировались!')
 			return redirect('index')
 	else:
 		form = RegisterForm()
 	return render(request, "PP/register.html", {"form": form})
+
+
 
 def login(request):
 	if request.method == 'POST':
@@ -35,18 +66,38 @@ def login(request):
 		form = UserLoginForm()
 	return render(request, "PP/login.html", {'form': form})
 
+
+
 def user_logout(request):
 	logout(request)
 	return redirect('index')
 
+
+
 def like(request, pk):
 	post = get_object_or_404(Post, id=request.POST.get('post_id'))
-	post.likes.add(request.user)
+	liked = False
+	if post.likes.filter(id=request.user.id).exists():
+		post.likes.remove(request.user)
+		liked = False
+	else:
+		post.likes.add(request.user)
+		liked = True
+
 	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+
 
 def like_comment(request, pk):
 	comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
-	comment.likes.add(request.user)
+	liked = False
+	if comment.likes.filter(id=request.user.id).exists():
+		comment.likes.remove(request.user)
+		liked = False
+	else:
+		comment.likes.add(request.user)
+		liked = True
+
 	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
@@ -69,14 +120,90 @@ class ProfilePage(DetailView):
 		context["page_user"] = page_user
 		context["posts"] = posts
 		return context
-
-	
 	
 
+def friends(request):
+	return render(request, "PP/friends.html", )
 
 
 
+class UpdatePostView(UpdateView):
+	model = Post
+	form_class = PostForm
+	template_name = "PP/update_post.html"
+
+	def get_success_url(self, **kwargs):
+		messages.success(self.request, 'Пост изменён.')
+		return reverse_lazy('post_detail', kwargs={'pk': self.object.id})
+		#return redirect(self.request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+
+@login_required
+def delete_post(request, post_id):
+	post = Post.objects.get(pk=post_id)
+	if request.user == post.author:
+		post.delete()
+		messages.success(request, 'Пост удалён.')
+		return redirect('index')
+	else:
+		messages.error(request, 'Вы не можете удалить этот объект.')
+		return redirect('index')
 
 
 
+@login_required
+def delete_post_profile(request, post_id):
+	post = Post.objects.get(pk=post_id)
+	if request.user == post.author:
+		post.delete()
+		messages.success(request, 'Пост удалён.')
+		return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+	else:
+		messages.error(request, 'Вы не можете удалить этот объект.')
+		return redirect('index')
+
+
+class UpdateCommentView(UpdateView):
+	model = Comment
+	form_class = CommentForm
+	template_name = "PP/update_comment.html" 
+
+	def get_success_url(self, **kwargs):
+		messages.success(self.request, 'Комментарий изменён.')
+		return reverse_lazy('post_detail', kwargs={'pk': self.object.post.id})
+		#return redirect(self.request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+@login_required
+def delete_comment(request, comment_id, post_id):
+	comment = Comment.objects.get(pk=comment_id)
+	post = Post.objects.get(pk=post_id)
+	if request.user == post.author:
+		comment.delete()
+		messages.success(request, 'Комментарий удалён.')
+		return redirect('index')
+	elif request.user == comment.author:
+		comment.delete()
+		messages.success(request, 'Комментарий удалён.')
+		return redirect('index')
+	else:
+		messages.error(request, 'Вы не можете удалить этот объект.')
+		return redirect('index')
+
+
+
+@login_required
+def delete_comment_profile(request, comment_id, post_id):
+	comment = Comment.objects.get(pk=comment_id)
+	post = Post.objects.get(pk=post_id)
+	if request.user == post.author:
+		comment.delete()
+		messages.success(request, 'Комментарий удалён.')
+		return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+	elif request.user == comment.author:
+		comment.delete()
+		messages.success(request, 'Комментарий удалён.')
+		return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+	else:
+		messages.error(request, 'Вы не можете удалить этот объект.')
+		return redirect('index')
 

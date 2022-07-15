@@ -1,0 +1,7 @@
+<div class="comment_form">
+  <form action="{% url 'post_detail' post.pk %}" method="post">
+    {% csrf_token %}
+    {{ create_comment_form }}
+    <button type="submit" class="btn btn-light">Запостить</button>
+  </form>
+</div>
