@@ -12,7 +12,7 @@
 	{% if post.can_edit %}
 	<h1 class="h1_detail">Редактировать пост</h1>
 	<div class="upd_flex">
-		<div class="profile_pic" style="margin-top: 3%">
+		<div class="profile_pic" style="margin-top: 2.8%">
 	      <a href="{% url 'profile_page' post.author.profile.id %}">
 	        {% if post.author.profile.profile_pic %}
 	        <img class="profile_pic" src="{{ post.author.profile.profile_pic.url }}" alt="-">
@@ -21,10 +21,13 @@
 	        {% endif %}
 	      </a>
 	    </div>
-		<form method="post" style="width: 70%; margin: 4% 0 0% 1%; padding-bottom: 5%;">
+		<form method="post" style="width: 65%; margin: 3% 0 0% 0.5%; padding-bottom: 5%;">
 			{% csrf_token %}
 			{{ form.as_p }}
-			<button action="{% url 'post_detail' post.pk %}" class="btn btn-primary" style="margin-top: -10px;">Сохранить</button>
+			<div class="button_group">
+				<button action="{% url 'post_detail' post.pk %}" class="btn btn-light" style="margin-top: -10px;">Сохранить</button>
+				<a href="{% url 'delete_post' post.pk %}" style="margin-top: -10px; margin-left: 20px;" class="btn btn-dark btn-sm">Удалить</a>
+			</div>
 		</form>
 	</div>
 	{% else %}

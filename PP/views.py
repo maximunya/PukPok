@@ -166,7 +166,19 @@ def delete_post_profile(request, post_id):
 class UpdateCommentView(UpdateView):
 	model = Comment
 	form_class = CommentForm
-	template_name = "PP/update_comment.html" 
+	template_name = "PP/update_comment.html"
+	
+
+	def get_context_data(self, *args, **kwargs):
+		context = super(UpdateCommentView, self).get_context_data(*args, **kwargs)
+		str_url = str(self.request.path)
+		splitted = str_url.split("/")
+		com_id = int(splitted[2])
+		context["splitted"] = splitted
+		context["com_id"] = com_id
+		context["str_url"] = str_url
+		return context
+
 
 	def get_success_url(self, **kwargs):
 		messages.success(self.request, 'Комментарий изменён.')

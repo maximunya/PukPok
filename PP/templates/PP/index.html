@@ -51,9 +51,9 @@ PukPok
                 {% if post.author.id == user.id %}
                 <div class="flex1">
                   {% if post.can_edit %}
-                  <a href="{% url 'update_post' post.pk %}" class="post_author"><p class="post_update">Изменить</p></a>
+                  <a href="{% url 'update_post' post.pk %}" class="post_author1"><p class="post_update">✎</p></a>
                   {% endif %}
-                  <a href="{% url 'delete_post' post.pk %}" class="post_author"><p class="post_delete">Удалить</p></a>
+                  <a href="{% url 'delete_post' post.pk %}" data-tooltip="Удалить" class="post_author1"><p data-tooltip="Удалить" class="post_delete">✕</p></a>
                 </div>
                 {% endif %}
                 {% endif %}
@@ -74,9 +74,33 @@ PukPok
                   </form>
                 </div>
                 {% if post.posted_at|date:"d M H:i:s" == post.edited_at|date:"d M H:i:s" %}
-                <p class="pub_date">{{ post.posted_at|date:" j E в H:i " }}</p>
+                  {% if post.mytime1 == 1 %}
+                  <p class="pub_date">сегодня в {{ post.posted_at|date:"H:i" }}</p>
+                  {% elif post.mytime1 == 2 %}
+                  <p class="pub_date">вчера в {{ post.posted_at|date:"H:i" }}</p>
+                  {% elif post.mytime1 == 3 %}
+                  <p class="pub_date">позавчера в {{ post.posted_at|date:"H:i" }}</p>
+                  {% elif post.mytime1 == 4 %}
+                  <p class="pub_date">{{ post.posted_at|date:"j E в H:i" }}</p>
+                  {% elif post.mytime1 == 5 %}
+                  <p class="pub_date">{{ post.posted_at|date:"j E y" }}</p>
+                  {% else %}
+                  <p class="pub_date">{{ post.mytime1 }}</p>
+                  {% endif %}
                 {% else %}
-                <p class="pub_date">{{ post.posted_at|date:" j E в H:i " }} (ред.)</p>
+                  {% if post.mytime1 == 1 %}
+                  <p class="pub_date">сегодня в {{ post.posted_at|date:"H:i" }} (ред.)</p>
+                  {% elif post.mytime1 == 2 %}
+                  <p class="pub_date">вчера в {{ post.posted_at|date:"H:i" }} (ред.)</p>
+                  {% elif post.mytime1 == 3 %}
+                  <p class="pub_date">позавчера в {{ post.posted_at|date:"H:i" }} (ред.)</p>
+                  {% elif post.mytime1 == 4 %}
+                  <p class="pub_date">{{ post.posted_at|date:"j E в H:i" }} (ред.)</p>
+                  {% elif post.mytime1 == 5 %}
+                  <p class="pub_date">{{ post.posted_at|date:"j E Y" }} (ред.)</p>
+                  {% else %}
+                  <p class="pub_date">{{ post.mytime1 }} (ред.)</p>
+                  {% endif %}
                 {% endif %}
               </div>
               <br> 
@@ -102,21 +126,45 @@ PukPok
                       {% if comment.author.id == user.id %}
                       <div class="flex1">
                         {% if comment.can_edit %}
-                        <a href="{% url 'update_comment' comment.pk %}" class="post_author"><p class="comment_update">Изменить</p></a>
+                        <a href="{% url 'update_comment' comment.pk %}" class="post_author1"><p class="comment_update">✎</p></a>
                         {% endif %}
-                        <a href="{% url 'delete_comment' post.pk comment.pk %}" class="post_author"><p class="comment_delete">Удалить</p></a>
+                        <a href="{% url 'delete_comment' post.pk comment.pk %}" class="post_author1"><p class="comment_delete">✕</p></a>
                       </div>
                       {% elif post.author.id == user.id %}
-                      <a href="{% url 'delete_comment' post.pk comment.pk %}" class="post_author"><p class="comment_delete">Удалить</p></a>
+                      <a href="{% url 'delete_comment' post.pk comment.pk %}" class="post_author1"><p class="comment_delete">✕</p></a>
                       {% endif %}
                       {% endif %}
                     </div>
                     <p class="comment_text">{{ comment.comment_text|linebreaks }}</p>
                     <div class="comment_info">
                       {% if comment.comment_posted_at|date:"d M H:i:s" == comment.comment_edited_at|date:"d M H:i:s" %}
-                      <p class="comment_pub_date">{{ comment.comment_posted_at|date:"d M в H:i" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% if comment.с_mytime1 == 1 %}
+                        <p class="comment_pub_date">сегодня в {{ comment.comment_posted_at|date:"H:i" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 2 %}
+                        <p class="comment_pub_date">вчера в {{ comment.comment_posted_at|date:"H:i" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 3 %}
+                        <p class="comment_pub_date">позавчера в {{ comment.comment_posted_at|date:"H:i" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 4 %}
+                        <p class="comment_pub_date">{{ comment.comment_posted_at|date:"j E в H:i" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 5 %}
+                        <p class="comment_pub_date">{{ comment.comment_posted_at|date:"j E Y" }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% else %}
+                        <p class="comment_pub_date">{{ comment.с_mytime1 }} &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% endif %}
                       {% else %}
-                      <p class="comment_pub_date">{{ comment.comment_posted_at|date:"d M в H:i" }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% if comment.с_mytime1 == 1 %}
+                        <p class="comment_pub_date">сегодня в {{ comment.comment_posted_at|date:"H:i" }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 2 %}
+                        <p class="comment_pub_date">вчера в {{ comment.comment_posted_at|date:"H:i" }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 3 %}
+                        <p class="comment_pub_date">позавчера в {{ comment.comment_posted_at|date:"H:i" }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 4 %}
+                        <p class="comment_pub_date">{{ comment.comment_posted_at|date:"j E в H:i" }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% elif comment.с_mytime1 == 5 %}
+                        <p class="comment_pub_date">{{ comment.comment_posted_at|date:"j E Y" }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% else %}
+                        <p class="comment_pub_date">{{ comment.с_mytime1 }} (ред.) &ensp; | &ensp; <a href="#" class="answer">Ответить</a></p>
+                        {% endif %}
                       {% endif %}
                       <div class="comment_likes">
                         <form action="{% url 'like_comment' comment.pk %}" class="comment_likes_info" method="POST">

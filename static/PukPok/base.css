@@ -256,6 +256,14 @@
 	font-size: 18px;
 }
 
+.post_author1:link {
+	margin-left: -17px;
+	margin-top: 5px;
+	font-weight: bold;
+	font-size: 18px;
+	text-decoration: none;
+}
+
 .comment_author {
 	text-decoration: none;
 	font-weight: bold;
@@ -689,7 +697,7 @@ footer p {
 }
 
 .user_header {
-	margin: 5% 0 4% 9%;
+	margin: 5% 0 4% 7%;
 	width: 81%;
 	border-radius: 0%;
 }
@@ -716,11 +724,12 @@ footer p {
 	font-size: 18px;
 	text-decoration: none;
 	color: white;
+	width: 50px;
 }
 
 .page_content {
 	width: 95%;
-	margin-left: 2%;
+	margin-left: 0;
 }
 
 .post_form {
@@ -870,8 +879,38 @@ footer p {
 
 .post_update {
 	font-weight: normal;
-	font-size: 15px;
-	margin-right: 25px;
+	font-size: 18px;
+	margin-right: 27px;
+	color: #555;
+	text-decoration: none;
+	margin-top: -2px;
+}
+
+.post_update:link {
+	font-weight: normal;
+	font-size: 18px;
+	margin-right: 27px;
+	color: #555;
+	text-decoration: none;
+	margin-top: -2px;
+}
+
+.post_update:hover {
+	font-weight: normal;
+	font-size: 18px;
+	margin-right: 27px;
+	color: #333;
+	text-decoration: none;
+	margin-top: -2px;
+}
+
+.post_update:active {
+	font-weight: normal;
+	font-size: 18px;
+	margin-right: 27px;
+	color: #111;
+	text-decoration: none;
+	margin-top: -2px;
 }
 
 .post {
@@ -886,7 +925,30 @@ footer p {
 
 .post_delete {
 	font-weight: normal;
-	font-size: 15px;
+	font-size: 16px;
+	color: #555;
+	text-decoration: none;
+}
+
+.post_delete:link {
+	font-weight: normal;
+	font-size: 16px;
+	color: #555;
+	text-decoration: none;
+}
+
+.post_delete:hover {
+	font-weight: normal;
+	font-size: 16px;
+	color: #333;
+	text-decoration: none;
+}
+
+.post_delete:active {
+	font-weight: normal;
+	font-size: 16px;
+	color: #111;
+	text-decoration: none;
 }
 
 .upd_flex {
@@ -904,13 +966,63 @@ footer p {
 
 .comment_update {
 	font-weight: normal;
-	font-size: 12px;
+	font-size: 14px;
 	margin-right: 25px;
+	color: #555;
+	text-decoration: none;
+	margin-top: -1px;
+}
+
+.comment_update:link {
+	font-weight: normal;
+	font-size: 14px;
+	margin-right: 25px;
+	color: #555;
+	text-decoration: none;
+}
+
+.comment_update:hover {
+	font-weight: normal;
+	font-size: 14px;
+	margin-right: 25px;
+	color: #333;
+	text-decoration: none;
+}
+
+.comment_update:active {
+	font-weight: normal;
+	font-size: 14px;
+	margin-right: 25px;
+	color: #111;
+	text-decoration: none;
 }
 
 .comment_delete {
 	font-weight: normal;
 	font-size: 12px;
+	color: #555;
+	text-decoration: none;
+}
+
+.comment_delete:link {
+	font-weight: normal;
+	font-size: 12px;
+	color: #555;
+	text-decoration: none;
+}
+
+.comment_delete:hover {
+	font-weight: normal;
+	font-size: 12px;
+	color: #333;
+	text-decoration: none;
+}
+
+.comment_delete:active {
+	font-weight: normal;
+	font-size: 12px;
+	color: #111;
+	text-decoration: none;
 }
 
 .message {
@@ -938,3 +1050,14 @@ footer p {
 	font-size: 13px;
 	max-width: 25%
 }
+
+.part_whole_comments {
+	background: #aaa;
+	display: flex;
+	margin-top: 10px;
+	padding: 8px 10px 14px 10px;
+	border: 1px solid #999;
+	border-radius: 10px/10px;
+	margin-left: -11px;
+}
+
