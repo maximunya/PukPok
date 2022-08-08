@@ -73,7 +73,7 @@ def user_logout(request):
 	return redirect('index')
 
 
-
+@login_required
 def like(request, pk):
 	post = get_object_or_404(Post, id=request.POST.get('post_id'))
 	liked = False
@@ -87,7 +87,7 @@ def like(request, pk):
 	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
-
+@login_required
 def like_comment(request, pk):
 	comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
 	liked = False
@@ -210,11 +210,13 @@ def delete_comment_profile(request, comment_id, post_id):
 	if request.user == post.author:
 		comment.delete()
 		messages.success(request, 'Комментарий удалён.')
-		return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+		#return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+		return redirect(comment)
 	elif request.user == comment.author:
 		comment.delete()
 		messages.success(request, 'Комментарий удалён.')
-		return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+		#return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+		return redirect(comment)
 	else:
 		messages.error(request, 'Вы не можете удалить этот объект.')
 		return redirect('index')
