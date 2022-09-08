@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Редактировать профиль
+{% endblock %}
+
+{% block content %}
+<main class="profile_page_main">
+	<div class="edit_profile_container">
+		<h1>Изменить профиль</h1>
+		<form method="post" enctype='multipart/form-data'>
+			{% csrf_token %}
+			{{ form.as_p }}
+			<button>
+			Сохранить
+			</button>
+		</form>
+	</div>
+</main>
+{% endblock %}

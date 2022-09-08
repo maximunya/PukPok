@@ -55,12 +55,30 @@
           <div class="bio_and_links">
             <h7 class="card-title">Био: &ensp; {{ page_user.bio }}</h7>
             <hr>
+            {% if page_user.first_name and page_user.last_name %}
+            <h7 class="card-title">Имя: &ensp; {{ page_user.first_name }} {{ page_user.last_name }}</h7>
+            <hr>
+            {% elif page_user.first_name %}
+            <h7 class="card-title">Имя: &ensp; {{ page_user.first_name }}</h7>
+            <hr>
+            {% endif %}
             {% if page_user.sex %}
             <h7 class="card-title">Пол: &ensp; {{ page_user.sex }}</h7>
             <hr>
             {% endif %}
+            {% if page_user.city %}
+            <h7 class="card-title">Город: &ensp; {{ page_user.city }}</h7>
+            <hr>
+            {% endif %}
+            {% if page_user.birthdate %}
+            <h7 class="card-title">День рождения: &ensp; {{ page_user.birthdate }}</h7>
+            <hr>
+            {% endif %}
             <h7 class="card-title">Дата регистрации: &ensp; {{ page_user.user.date_joined|date:"j E Y г." }}</h5>
             <hr>
+            <a class="btn btn-info btn-sm mr-1" href="{% url 'edit_profile' request.user.id %}">Изменить профиль</a>
+            <a class="btn btn-warning btn-sm mr-1" href="{% url 'user_settings' request.user.id %}">Настройки аккаунта</a>
+            <a class="btn btn-light btn-sm" href="http://127.0.0.1:8000/pukpok/user/edit_profile/">⚙️</a>
           </div>
         </div>
       </div>

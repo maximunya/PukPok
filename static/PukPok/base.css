@@ -700,6 +700,7 @@ footer p {
 	margin: 5% 0 4% 7%;
 	width: 81%;
 	border-radius: 0%;
+	padding-top: 5%;
 }
 
 .pic_and_bio {
@@ -1061,3 +1062,39 @@ footer p {
 	margin-left: -11px;
 }
 
+.img4 {
+	width: 25px;
+}
+
+.img1 {
+	width: 27px;
+}
+
+.img3 {
+	width: 25px;
+}
+
+.img2 {
+	width: 25px;
+}
+
+.img8 {
+	width: 35px;
+}
+
+.img5 {
+	width: 37px;
+}
+
+.img7 {
+	width: 35px;
+}
+
+.img6 {
+	width: 35px;
+}
+
+.edit_profile_container {
+	padding: 10%, 5%;
+	color: white;
+}

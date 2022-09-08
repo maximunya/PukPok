@@ -1093,3 +1093,8 @@ footer p {
 .img6 {
 	width: 35px;
 }
+
+.edit_profile_container {
+	padding: 5% 5%;
+	color: white;
+}

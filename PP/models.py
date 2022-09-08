@@ -17,6 +17,10 @@ class Profile(models.Model):
 
 	user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
 	bio = models.TextField(max_length=500)
+	birthdate = models.DateField(null=True, blank=True)
+	city = models.CharField(max_length=50, null=True, blank=True)
+	first_name = models.CharField(max_length=50, null=True, blank=True)
+	last_name = models.CharField(max_length=50, null=True, blank=True)
 	profile_pic = models.ImageField(null=True, blank=True, upload_to="profile-images/",)
 	sex = models.CharField(null=True, blank=True, max_length=7, choices=SEX_CHOICES)
 	link1 = models.CharField(max_length=300, null=True, blank=True,)
@@ -26,6 +30,7 @@ class Profile(models.Model):
 
 	def __str__(self):
 		return str(self.user)
+
 
 
 @receiver(post_save, sender=User)

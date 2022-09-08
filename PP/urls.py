@@ -1,6 +1,9 @@
 from django.urls import path
 from . import views
-from .views import ProfilePage, CreatePostForm, CreateCommentForm, PostDetailView, UpdatePostView, UpdateCommentView
+from .views import ProfilePage, CreatePostForm, CreateCommentForm, PostDetailView, UpdateUserProfileAPI
+from .views import UpdatePostView, UpdateCommentView, UpdateProfileView, UpdateUserView
+from rest_framework.routers import SimpleRouter
+
 
 urlpatterns = [
 	path('', views.index, name = 'index'),
@@ -20,4 +23,7 @@ urlpatterns = [
 	path('comment/<int:pk>/edit', UpdateCommentView.as_view(), name='update_comment'),
 	path('post/<post_id>/comment/<comment_id>/delete', views.delete_comment, name = 'delete_comment'),
 	path('post/<post_id>/comment/<comment_id>/remove', views.delete_comment_profile, name = 'delete_comment_profile'),
+	path('user/<int:pk>/edit_profile', UpdateProfileView.as_view(), name='edit_profile'),
+	path('user/<int:pk>/user_settings', UpdateUserView.as_view(), name='user_settings'),
 ]
+

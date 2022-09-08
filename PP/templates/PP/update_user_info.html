@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load rest_framework %}
+
+{% block title %}
+Редактировать профиль
+{% endblock %}
+
+{% block content %}
+<main class="profile_page_main">
+	<div class="edit_profile_container">
+		<h1>Изменить профиль</h1>
+		<form method="post" enctype='multipart/form-data'>
+			{% csrf_token %}
+			{% render_form serializer %}
+			<button>
+			Сохранить
+			</button>
+		</form>
+	</div>
+</main>
+{% endblock %}
