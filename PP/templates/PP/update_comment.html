@@ -22,7 +22,7 @@
 	        {% endif %}
 	      </a>
 	    </div>
-	    <div class="alert alert-dark" style="padding-left: 25px;">
+	    <div class="alert alert-dark" style="padding-left: 25px; border-radius: 20px 20px;">
 	      <div class="flex">
             <a href="{% url 'profile_page' comment.post.author.profile.id %}" class="profile_url"><p class="post_author">{{ comment.post.author.username }}</p></a>
             {% if user.is_authenticated %}

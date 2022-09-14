@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post, Comment, Profile
-from .forms import RegisterForm, UserLoginForm, PostForm, CommentForm, ProfileForm
+from .forms import RegisterForm, UserLoginForm, PostForm, CommentForm, ProfileForm, UserUpdateForm
 from django.contrib.auth import login as auth_login, logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, CreateView, FormView, UpdateView
 from django.views.generic.edit import ModelFormMixin 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserChangeForm
 from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,35 +18,61 @@ from .services.update import update_user_profile
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework import permissions
 
-class UpdateUserProfileAPI(viewsets.GenericViewSet):
-	renderer_classes = [TemplateHTMLRenderer,]
-	template_name = 'PP/update_user_info.html'
-	permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
 
-	def get_queryset(self):
-		queryset = User.objects.all()
-		return queryset
 
-	def get_serializer_class(self):
-		return UserProfileSerializer
 
-	@action(methods=["GET",], detail=False)
-	def get(self, request):
-		return Response({'serializer': self.get_serializer_class(),},)
+class LoggedAndPassedTestUserMixin(LoginRequiredMixin, UserPassesTestMixin):
 
-	@action(methods=["POST",], detail=False)
-	def post(self, request):
-		user = request.user
-		data = request.data
-		update_user_profile(user=user, data=data)
-		return Response({'serializer': self.get_serializer_class(),},)
+	def test_func(self):
+		return self.request.user.id == self.kwargs['pk']
 
-	@action(methods=["PUT",], detail=False)
-	def edit_profile(self, request, *args, **kwargs):
-		user = request.user
-		data = request.data
-		update_user_profile(user=user, data=data)
-		return Response({'serializer': self.get_serializer_class(),},)
+	def handle_no_permission(self):
+		messages.error(self.request, 'Ошибка доступа')
+		return redirect('index')
+
+
+
+class LoggedAndPassedTestPostMixin(LoginRequiredMixin, UserPassesTestMixin):
+
+	def test_func(self):
+		post = Post.objects.get(id=self.kwargs['pk'])
+		return self.request.user.id == post.author.id
+
+	def handle_no_permission(self):
+		messages.error(self.request, 'Ошибка доступа')
+		return redirect('index')
+
+
+#class UpdateUserProfileAPI(viewsets.GenericViewSet):
+
+	#renderer_classes = [TemplateHTMLRenderer,]
+	#template_name = 'PP/update_user_info.html'
+	#permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
+
+	#def get_queryset(self):
+	#	queryset = Profile.objects.all()
+	#	return queryset
+
+	#def get_serializer_class(self):
+	#	return UserProfileSerializer
+
+	#@action(methods=["GET",], detail=False)
+	#def get(self, request):
+	#	return Response({'serializer': self.get_serializer_class(),},)
+
+	#@action(methods=["POST",], detail=False)
+	#def post(self, request):
+	#	user = request.user
+	#	data = request.data
+	#	update_user_profile(user=user, data=data)
+	#	return Response({'serializer': self.get_serializer_class(),},)
+
+	#@action(methods=["PUT",], detail=False)
+	#def edit_profile(self, request, *args, **kwargs):
+	#	user = request.user
+	#	data = request.data
+	#	update_user_profile(user=user, data=data)
+	#	return Response({'serializer': self.get_serializer_class(),},)
 
 	#def get_success_url(self, **kwargs):
 		#return reverse_lazy('profile_page', kwargs={'pk': self.request.user.id})
@@ -66,7 +92,6 @@ def index(request):
 class PostDetailView(DetailView):
 	model = Post
 	template_name = 'PP/post_detail.html'
-	#success_url = reverse('post_detail', kwargs={'pk': self.object.id})
 
 	def get_context_data(self, *args, **kwargs):
 		context = super(PostDetailView, self).get_context_data(*args, **kwargs)
@@ -106,6 +131,7 @@ def login(request):
 	return render(request, "PP/login.html", {'form': form})
 
 
+@login_required
 def user_logout(request):
 	logout(request)
 	return redirect('index')
@@ -142,7 +168,6 @@ def like_comment(request, pk):
 class CreatePostForm(CreateView):
 	form_class = PostForm
 	template_name = 'PP/create_post.html'
-	#success_url = redirect('profile_page')
 
 
 class ProfilePage(DetailView):
@@ -153,18 +178,18 @@ class ProfilePage(DetailView):
 		context = super(ProfilePage, self).get_context_data(*args, **kwargs)
 		posts = Post.objects.filter(author_id=self.kwargs['pk'])
 		page_user = get_object_or_404(Profile, id=self.kwargs['pk'])
-		#context["form"] = AddPost
 		context['create_post_form'] = PostForm()
 		context["page_user"] = page_user
 		context["posts"] = posts
 		return context
 	
 
+@login_required
 def friends(request):
 	return render(request, "PP/friends.html", )
 
 
-class UpdatePostView(UpdateView):
+class UpdatePostView(LoggedAndPassedTestPostMixin, UpdateView):
 	model = Post
 	form_class = PostForm
 	template_name = "PP/update_post.html"
@@ -172,24 +197,25 @@ class UpdatePostView(UpdateView):
 	def get_success_url(self, **kwargs):
 		messages.success(self.request, 'Пост изменён.')
 		return reverse_lazy('post_detail', kwargs={'pk': self.object.id})
-		#return redirect(self.request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
-class UpdateProfileView(UpdateView):
+class UpdateProfileView(LoggedAndPassedTestUserMixin, UpdateView):
 	model = Profile
 	form_class = ProfileForm
 	template_name = 'PP/edit_profile.html'
 
 	def get_success_url(self, **kwargs):
+		messages.success(self.request, 'Информация профиля изменена.')
 		return reverse_lazy('profile_page', kwargs={'pk': self.request.user.id})
 
 
-class UpdateUserView(UpdateView):
+class UpdateUserView(LoggedAndPassedTestUserMixin, UpdateView):
 	model = User
-	form_class = UserChangeForm
+	form_class = UserUpdateForm
 	template_name = 'PP/user_settings.html'
 
 	def get_success_url(self, **kwargs):
+		messages.success(self.request, 'Данные вашего аккаунта изменены.')
 		return reverse_lazy('profile_page', kwargs={'pk': self.request.user.id})
 
 
@@ -235,7 +261,6 @@ class UpdateCommentView(UpdateView):
 	def get_success_url(self, **kwargs):
 		messages.success(self.request, 'Комментарий изменён.')
 		return reverse_lazy('post_detail', kwargs={'pk': self.object.post.id})
-		#return redirect(self.request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
 @login_required
@@ -262,13 +287,22 @@ def delete_comment_profile(request, comment_id, post_id):
 	if request.user == post.author:
 		comment.delete()
 		messages.success(request, 'Комментарий удалён.')
-		#return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 		return redirect(comment)
 	elif request.user == comment.author:
 		comment.delete()
 		messages.success(request, 'Комментарий удалён.')
-		#return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 		return redirect(comment)
+	else:
+		messages.error(request, 'Вы не можете удалить этот объект.')
+		return redirect('index')
+
+
+@login_required
+def delete_user(request, pk):
+	if request.user.id == pk:
+		request.user.delete()
+		messages.success(request, 'Аккаунт удалён.')
+		return redirect('index')
 	else:
 		messages.error(request, 'Вы не можете удалить этот объект.')
 		return redirect('index')

@@ -8,14 +8,18 @@
 {% block content %}
 <main class="profile_page_main">
 	<div class="edit_profile_container">
-		<h1>Изменить профиль</h1>
+		{% if user.is_authenticated %}
+		{% if request.user.id == profile.pk %}
+		<h1 class="title">Изменить профиль</h1>
 		<form method="post" enctype='multipart/form-data'>
 			{% csrf_token %}
 			{{ form.as_p }}
-			<button>
+			<button class="btn btn-primary">
 			Сохранить
 			</button>
 		</form>
+		{% endif %}
+		{% endif %}
 	</div>
 </main>
 {% endblock %}

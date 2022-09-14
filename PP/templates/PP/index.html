@@ -44,7 +44,7 @@ PukPok
                 {% endif %}
               </a>
             </div>
-            <div class="alert alert-dark" style="margin-left: 0px; padding-left: 25px;">
+            <div class="alert alert-dark" style="margin-left: 0px; padding-left: 25px; border-radius: 20px 20px; ">
               <div class="flex">
                 <a href="{% url 'profile_page' post.author.profile.id %}" class="profile_url"><p class="post_author">{{ post.author.username }}</p></a>
                 {% if user.is_authenticated %}
@@ -184,7 +184,6 @@ PukPok
                         </form>
                       </div>
                     </div>
-                  
                   </div>
                 </div>
                 <hr>

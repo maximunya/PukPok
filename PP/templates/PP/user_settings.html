@@ -8,14 +8,20 @@
 {% block content %}
 <main class="profile_page_main">
 	<div class="edit_profile_container">
-		<h1>Настройки аккаунта</h1>
+		{% if user.is_authenticated %}
+		{% if request.user.id == user.pk %}
+		<h1 class="title">Настройки аккаунта</h1>
 		<form method="post">
 			{% csrf_token %}
 			{{ form.as_p }}
-			<button>
-			Сохранить
-			</button>
+			<button class="btn btn-light">Сохранить</button>
+			<a href="{% url 'delete_user' user.pk %}" class="btn btn-danger btn-sm ml-3">Удалить аккаунт</a>
 		</form>
+		{% endif %}
+		{% endif %}
 	</div>
 </main>
+<script>
+	document.getElementById("id_password").style.display = "none";
+</script>
 {% endblock %}

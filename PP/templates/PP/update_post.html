@@ -37,19 +37,7 @@
 		<img src="{% static 'PukPok/img/дефолтная-ава.png' %}" alt="" style="margin: 0 32.5% 0 32.5%; width: 400px; padding-bottom: 0">
 	</div>
 	{% endif %}
-	{% else %}
-	<div class="govno">
-		<h2 class="h1_detail" style="margin-bottom: 0; padding: 8% 17% 4% 23%;">Вы не можете редактировать этот пост :(</h2>
-		<a href="{% url 'index' %}" class="btn btn-light btn-lg" style="margin: 0 43%; margin-bottom: 3%">На главную</a>
-		<img src="{% static 'PukPok/img/дефолтная-ава.png' %}" alt="" style="margin: 0 32.5% 0 32.5%; width: 400px; padding-bottom: 0">
-	</div>
 	{% endif %}
-	{% else %}
-	<div class="govno">
-		<h2 class="h1_detail" style="margin-bottom: 0; padding: 8% 23% 4% 20%; text-align: center;">Авторизуйтесь, прежде чем редактировать этот пост</h2>
-		<a href="{% url 'login' %}" class="btn btn-light btn-lg" style="margin: 0 44.99%; margin-bottom: 3%">Войти</a>
-		<img src="{% static 'PukPok/img/дефолтная-ава.png' %}" alt="" style="margin: 0 32.5% 0 32.3%; width: 400px; padding-bottom: 0">
-	</div>
 	{% endif %}
 </main>
 {% endblock %}

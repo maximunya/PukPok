@@ -8,6 +8,10 @@ from datetime import timedelta, datetime, date
 from django.utils import timezone as tz
 from django.utils import dateformat
 import pytz
+from ckeditor.fields import RichTextField
+
+
+
 
 class Profile(models.Model):
 	SEX_CHOICES = [
@@ -16,7 +20,7 @@ class Profile(models.Model):
 	]
 
 	user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-	bio = models.TextField(max_length=500)
+	bio = models.TextField(max_length=500, null=True, blank=True)
 	birthdate = models.DateField(null=True, blank=True)
 	city = models.CharField(max_length=50, null=True, blank=True)
 	first_name = models.CharField(max_length=50, null=True, blank=True)
@@ -31,6 +35,10 @@ class Profile(models.Model):
 	def __str__(self):
 		return str(self.user)
 
+
+	class Meta:
+		verbose_name = 'Профиль'
+		verbose_name_plural = 'Профили'
 
 
 @receiver(post_save, sender=User)

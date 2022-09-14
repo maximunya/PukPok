@@ -26,13 +26,13 @@
   			<div class="profile_picture">
   				<a href="{% url 'profile_page' request.user.id %}">
   			    {% if user.profile.profile_pic %}
-                  <img class="profile_picture" src="{{ user.profile.profile_pic.url }}" alt="-">
+                  <img class="profile_picture" src="{{ request.user.profile.profile_pic.url }}" alt="-">
                 {% else %}
                   <img class="profile_pic_comments" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-">
                 {% endif %}
   				</a>
   			</div>
-        	<div><a class="a_profile" href="{% url 'logout' %}">{{ user.username }}</a></div>
+        	<div><a class="a_profile" href="{% url 'logout' %}">{{ request.user.username }}</a></div>
     	</div>
   		{% else %}
   		<div class="reg">

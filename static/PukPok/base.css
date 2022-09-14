@@ -147,6 +147,7 @@
 	padding-left: 1%;
 }
 
+
 .last_posts {
 	color: white;
 	padding-top: 4%;
@@ -220,6 +221,7 @@
 
 .whole_post {
 	display: flex;
+	margin-bottom: 50px;
 }
 
 .profile_pic_comments {
@@ -920,8 +922,7 @@ footer p {
 }
 
 .flex1 {
-	display: flex;
-	margin-right: 
+	display: flex; 
 }
 
 .post_delete {
@@ -1095,6 +1096,66 @@ footer p {
 }
 
 .edit_profile_container {
-	padding: 10%, 5%;
+	padding: 5% 5%;
 	color: white;
+}
+
+.username_input {
+	width: 20%;
+}
+
+.email_input {
+	width: 20%;
+}
+
+.profile_pic_input {
+	width: 20%;
+}
+
+.bio_input {
+	width: 20%;
+}
+
+.birthdate_input {
+	width: 20%;
+}
+
+.city_input {
+	width: 20%;
+}
+
+.first_name_input {
+	width: 20%;
+}
+
+.last_name_input {
+	width: 20%;
+}
+
+.sex_input {
+	width: 20%;
+}
+
+.vk_input {
+	width: 20%;
+}
+
+.inst_input {
+	width: 20%;
+}
+
+.telegram_input {
+	width: 20%;
+}
+
+.tiktok_input {
+	width: 20%;
+}
+
+legend {
+	display: none;
+}
+
+.title {
+	margin-bottom: 2%;
 }

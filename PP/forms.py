@@ -1,7 +1,14 @@
 from django import forms 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserChangeForm
 from .models import Post, Comment, Profile
+from ckeditor.widgets import CKEditorWidget
+import re
+from django.core.exceptions import ValidationError
+
+
+
 
 SEX_CHOICES = [
 		('Мужской', 'Мужской'),
@@ -35,6 +42,8 @@ class PostForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
 		super(PostForm, self).__init__(*args, **kwargs)
 		self.fields['content'].label = ''
+		#self.fields['content'].widget = CKEditorWidget()
+
 
 class CommentForm(forms.ModelForm):
 
@@ -63,7 +72,8 @@ class ProfileForm(forms.ModelForm):
 		]
 		widgets = {
 			#'profile_pic': forms.FileInput(attrs={'class': 'profile_pic_input', 'id': 'profile_pic_input',}),
-			'bio': forms.TextInput(attrs={'class': 'bio_input', 'id': 'bio_input',}),			
+			'bio': forms.TextInput(attrs={'class': 'bio_input', 'id': 'bio_input',}),
+			'birthdate': forms.TextInput(attrs={'class': 'birthdate_input', 'type': 'date', 'id': 'birthdate_input',}),			
 			'first_name': forms.TextInput(attrs={'class': 'first_name_input', 'id': 'first_name_input',}),
 			'last_name': forms.TextInput(attrs={'class': 'last_name_input', 'id': 'last_name_input',}),
 			'sex': forms.Select(attrs={'class': 'select', 'id': 'select',}),
@@ -74,27 +84,60 @@ class ProfileForm(forms.ModelForm):
 		}
 
 
-#class UserProfileForm(forms.Form):
-	#username = forms.CharField(label='Username', max_length=30)
-	#email = forms.EmailField(label='E-mail', max_length=255)
-	#profile_pic = forms.ImageField(label='Profile Picture')
-	#bio = forms.CharField(label='io', max_length=300)
-	#birthdate = forms.DateField()
-	#city = forms.CharField(label='City', max_length=100)
-	#first_name = forms.CharField(label='First name', max_length=50)
-	#last_name = forms.CharField(label='Last name', max_length=50)
-	#sex = forms.ChoiceField(label='Sex', choices=SEX_CHOICES)
-	#link1 = forms.URLField(label='VK')
-	#link2 = forms.URLField(label='Instagram')
-	#link3 = forms.URLField(label='Telegram')
-	#link4 = forms.URLField(label='TikTok')
+	def __init__(self, *args, **kwargs):
+		super(ProfileForm, self).__init__(*args, **kwargs)
+		self.fields['profile_pic'].label = 'Картинка профиля'
+		self.fields['bio'].label = 'Био'
+		self.fields['birthdate'].label = 'Дата рождения'
+		self.fields['city'].label = 'Город'
+		self.fields['first_name'].label = 'Имя'
+		self.fields['last_name'].label = 'Фамилия'
+		self.fields['sex'].label = 'Пол'
+		self.fields['link1'].label = 'Вконтакте'
+		self.fields['link2'].label = 'Instagram'
+		self.fields['link3'].label = 'Telegram'
+		self.fields['link4'].label = 'TikTok'
 
-	#class Meta:
-		#fields = ['username', 'email']
-		#widgets = {
-		#	'username': forms.TextInput(attrs={'class': 'username_input', 'id': 'username_input',}),
-		#	'email': forms.TextInput(attrs={'class': 'email_input', 'id': 'email_input',}),
-		#}
+
+regex1 = r"^[a-z0-9_.]+$"
+regex2 = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+def valid_username(strg):
+	if re.fullmatch(regex1, strg):
+		return True
+	else:
+		return False
+
+def valid_email(strg):
+	if re.fullmatch(regex2, strg):
+		return True
+	else:
+		return False
+
+
+class UserUpdateForm(UserChangeForm):
+
+	class Meta:
+		model = User
+		fields = ['username', 'email',]
+
+	def __init__(self, *args, **kwargs):
+		super(UserUpdateForm, self).__init__(*args, **kwargs)
+		self.fields['email'].label = 'Электронная почта'
+		#self.fields['password'].label = ''
+		self.fields['username'].help_text = ''
+		self.fields['password'].help_text = ''
+
+	def clean(self):
+		cleaned_data = super(UserUpdateForm, self).clean()
+		username = cleaned_data.get('username')
+		email = cleaned_data.get('email')
+		if username is not None and email is not None:
+			if not valid_username(username):
+				self.add_error(None, ValidationError('Имя пользователя может состоять только из латинницы, цифр и символов -_.'))
+			if not valid_email(email):
+				self.add_error(None, ValidationError('Указан неверный адрес электронной почты'))
+
 
 
 

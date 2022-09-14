@@ -23,7 +23,7 @@
     </div>
   {% endif %}
   <div class="user_header">
-    <div class="card text-white bg-dark mb-5" style="border: 2px solid #111;">
+    <div class="card text-white bg-dark mb-5" style="border: 2px solid #111; border-radius: 30px 30px;">
       <div class="card-header" style="display: flex; justify-content: space-between; margin: 0; padding: 8px 8px 5px 5px;">
         <h2 class="username">{{ page_user }}</h2>
         <h5 class="username">
@@ -53,17 +53,15 @@
           {% endif %}
           </div>
           <div class="bio_and_links">
-            <h7 class="card-title">Био: &ensp; {{ page_user.bio }}</h7>
+            {% if page_user.bio %}
+            <h7 class="card-title">{{ page_user.bio }}</h7>
             <hr>
+            {% endif %}
             {% if page_user.first_name and page_user.last_name %}
             <h7 class="card-title">Имя: &ensp; {{ page_user.first_name }} {{ page_user.last_name }}</h7>
             <hr>
             {% elif page_user.first_name %}
             <h7 class="card-title">Имя: &ensp; {{ page_user.first_name }}</h7>
-            <hr>
-            {% endif %}
-            {% if page_user.sex %}
-            <h7 class="card-title">Пол: &ensp; {{ page_user.sex }}</h7>
             <hr>
             {% endif %}
             {% if page_user.city %}
@@ -74,11 +72,12 @@
             <h7 class="card-title">День рождения: &ensp; {{ page_user.birthdate }}</h7>
             <hr>
             {% endif %}
-            <h7 class="card-title">Дата регистрации: &ensp; {{ page_user.user.date_joined|date:"j E Y г." }}</h5>
-            <hr>
-            <a class="btn btn-info btn-sm mr-1" href="{% url 'edit_profile' request.user.id %}">Изменить профиль</a>
-            <a class="btn btn-warning btn-sm mr-1" href="{% url 'user_settings' request.user.id %}">Настройки аккаунта</a>
-            <a class="btn btn-light btn-sm" href="http://127.0.0.1:8000/pukpok/user/edit_profile/">⚙️</a>
+            {% if user.is_authenticated %}
+              {% if user.id == page_user.id %}
+              <a class="btn btn-light btn-sm mr-1" href="{% url 'edit_profile' request.user.id %}">Изменить профиль</a>
+              <a class="btn btn-secondary btn-sm mr-1" href="{% url 'user_settings' request.user.id %}">Настройки аккаунта</a>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
       </div>
@@ -88,8 +87,9 @@
     {% if user.is_authenticated %}
       {% if user.id == page_user.id %}
         <div class="post_form">
-          <form class="form" style="width: 103%;" action="{% url 'create_post' %}" method="post">
+          <form class="form" enctype='multipart/form-data' style="width: 103%;" action="{% url 'create_post' %}" method="post">
             {% csrf_token %}
+            {{ create_post_form.media }}
             {{ create_post_form }}
             <button type="submit" class="btn btn-light btn-block" style="margin-top: 5px; width: 15%; text-align: center; margin-left: 85%; margin-bottom: 5%;" >Запостить</button>
           </form>
@@ -115,7 +115,7 @@
                   {% endif %}
                 </a>
               </div>
-              <div class="alert alert-dark" style="padding-left: 25px;">
+              <div class="alert alert-dark" style="padding-left: 25px; border-radius: 20px 20px;">
                 <div class="flex">
                   <a href="{% url 'profile_page' post.author.profile.id %}" class="profile_url"><p class="post_author">{{ post.author.username }}</p></a>
                   {% if user.is_authenticated %}
