@@ -72,7 +72,7 @@ class ProfileForm(forms.ModelForm):
 		]
 		widgets = {
 			#'profile_pic': forms.FileInput(attrs={'class': 'profile_pic_input', 'id': 'profile_pic_input',}),
-			'bio': forms.TextInput(attrs={'class': 'bio_input', 'id': 'bio_input',}),
+			'bio': forms.Textarea(attrs={'class': 'bio_input', 'id': 'bio_input',}),
 			'birthdate': forms.TextInput(attrs={'class': 'birthdate_input', 'type': 'date', 'id': 'birthdate_input',}),			
 			'first_name': forms.TextInput(attrs={'class': 'first_name_input', 'id': 'first_name_input',}),
 			'last_name': forms.TextInput(attrs={'class': 'last_name_input', 'id': 'last_name_input',}),

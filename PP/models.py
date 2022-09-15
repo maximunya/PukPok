@@ -35,7 +35,6 @@ class Profile(models.Model):
 	def __str__(self):
 		return str(self.user)
 
-
 	class Meta:
 		verbose_name = 'Профиль'
 		verbose_name_plural = 'Профили'

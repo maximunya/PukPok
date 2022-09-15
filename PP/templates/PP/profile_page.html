@@ -8,7 +8,7 @@
 {% block content %}
 <main class="main_container">
   {% if messages %}
-    <div style="margin-bottom: -45px; margin-top: 30px; margin-left: 75%; width: 11%; text-align: center;" class="profile_message">
+    <div style="margin-bottom: -100px; padding-top: 6%; margin-left: 73%; width: 12.5%; text-align: center; font-size: 12px;" class="profile_message">
     {% for message in messages %}
       {% if message.tags == 'error' %}
       <div class="alert alert-danger mt-4 ml-5 mb-0 pl-0 pr-0 pt-2 pb-2" style="margin-bottom: -75px;" role="alert">
@@ -84,6 +84,7 @@
     </div>
   </div>
   <div class="page_content" style="padding-bottom: 20%; margin-bottom: 0;">
+    <p style="color: white; margin-left: 15%;">{{ total_posts }}</p>
     {% if user.is_authenticated %}
       {% if user.id == page_user.id %}
         <div class="post_form">
@@ -101,7 +102,8 @@
 
         </div>
       {% endif %}
-    {% endif %}  
+    {% endif %}
+
     <div style="padding-bottom: 1%; margin-bottom: 0;" class="posts">
           {% for post in posts %}
           <div class="post" style="width: 103%;">

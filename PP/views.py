@@ -177,10 +177,33 @@ class ProfilePage(DetailView):
 	def get_context_data(self, *args, **kwargs):
 		context = super(ProfilePage, self).get_context_data(*args, **kwargs)
 		posts = Post.objects.filter(author_id=self.kwargs['pk'])
+		posts_amount = posts.count()
+		if posts_amount <= 10:
+			if posts_amount == 1:
+				total_posts = f"{posts_amount} пост"
+			elif posts_amount in [2, 3, 4]:
+				total_posts = f"{posts_amount} поста"
+			else:
+				total_posts = f"{posts_amount} постов"
+		elif posts_amount > 10 and posts_amount < 100:
+			if posts_amount % 10 == 1 and posts_amount != 11:
+				total_posts = f"{posts_amount} пост"
+			elif posts_amount % 10 in [2, 3, 4] and posts_amount not in [12, 13, 14]:
+				total_posts = f"{posts_amount} поста"
+			else:
+				total_posts = f"{posts_amount} постов"
+		else:
+			if posts_amount % 10 == 1 and posts_amount % 100 != 11:
+				total_posts = f"{posts_amount} пост"
+			elif posts_amount % 10 in [2, 3, 4] and posts_amount % 100 not in [12, 13, 14]:
+				total_posts = f"{posts_amount} поста"
+			else:
+				total_posts = f"{posts_amount} постов"
 		page_user = get_object_or_404(Profile, id=self.kwargs['pk'])
 		context['create_post_form'] = PostForm()
 		context["page_user"] = page_user
 		context["posts"] = posts
+		context['total_posts'] = total_posts
 		return context
 	
 
