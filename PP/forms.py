@@ -6,6 +6,8 @@ from .models import Post, Comment, Profile
 from ckeditor.widgets import CKEditorWidget
 import re
 from django.core.exceptions import ValidationError
+from django.forms.utils import ErrorList
+from django.utils.html import format_html, format_html_join
 
 
 
@@ -15,9 +17,11 @@ SEX_CHOICES = [
 		('Женский', 'Женский'),
 	]
 
+
 class UserLoginForm(AuthenticationForm):
 	username = forms.CharField(label='', max_length=20, widget=forms.TextInput(attrs={'class':'login_input', 'placeholder': 'Имя пользователя'}))
 	password = forms.CharField(label='', max_length=30, widget=forms.PasswordInput(attrs={'class':'login_input', 'placeholder': 'Пароль'}))
+
 
 class RegisterForm(UserCreationForm):
 	username = forms.CharField(label='', max_length=20, widget=forms.TextInput(attrs={'class':'reg_input', 'placeholder': 'Имя пользователя'}))
@@ -29,13 +33,21 @@ class RegisterForm(UserCreationForm):
 		model = User
 		fields = ('username', 'email', 'password1', 'password2', )
 
+	def clean(self):
+		cleaned_data = super(RegisterForm, self).clean()
+		username = cleaned_data.get('username')
+		if username is not None:
+			if not valid_username(username):
+				self.add_error('username', ValidationError('Имя пользователя может состоять только из латинницы, цифр и символов -_.'))
+
+
 class PostForm(forms.ModelForm):
 
 	class Meta:
 		model = Post
 		fields = ['content', 'author',]
 		widgets = {
-			'content': forms.Textarea(attrs={'class': 'post_input', 'placeholder': 'Поделитесь чем-нибудь с нами!'}),
+			'content': forms.Textarea(attrs={'class': 'post_input', 'placeholder': 'Поделитесь чем-нибудь с нами!', 'id': 'text_input',}),
 			'author': forms.TextInput(attrs={'class': 'form-control', 'value': '', 'id': 'name', 'type': 'hidden',})
 		}
 
@@ -52,7 +64,7 @@ class CommentForm(forms.ModelForm):
 		fields = ['post', 'comment_text', 'author']
 		widgets = {
 			'post': forms.TextInput(attrs={'class': 'comment_input', 'value': '', 'id': 'post', 'type': 'hidden',}),
-			'comment_text': forms.Textarea(attrs={'class': 'comment_input', 'autofocus': 'on', 'placeholder': 'Напишите комментарий'}),
+			'comment_text': forms.Textarea(attrs={'class': 'comment_input', 'autofocus': 'on', 'placeholder': 'Напишите комментарий', 'id': 'text_input',}),
 			'author': forms.TextInput(attrs={'class': 'form-control', 'value': '', 'id': 'author', 'type': 'hidden',})
 		}
 		
@@ -72,15 +84,16 @@ class ProfileForm(forms.ModelForm):
 		]
 		widgets = {
 			#'profile_pic': forms.FileInput(attrs={'class': 'profile_pic_input', 'id': 'profile_pic_input',}),
-			'bio': forms.Textarea(attrs={'class': 'bio_input', 'id': 'bio_input',}),
-			'birthdate': forms.TextInput(attrs={'class': 'birthdate_input', 'type': 'date', 'id': 'birthdate_input',}),			
-			'first_name': forms.TextInput(attrs={'class': 'first_name_input', 'id': 'first_name_input',}),
-			'last_name': forms.TextInput(attrs={'class': 'last_name_input', 'id': 'last_name_input',}),
-			'sex': forms.Select(attrs={'class': 'select', 'id': 'select',}),
-			'link1': forms.URLInput(attrs={'class': 'vk_url', 'id': 'vk_url',}),
-			'link2': forms.URLInput(attrs={'class': 'inst_url', 'id': 'inst_url',}),
-			'link3': forms.URLInput(attrs={'class': 'tg_url', 'id': 'tg_url',}),
-			'link4': forms.URLInput(attrs={'class': 'tiktok_url', 'id': 'tiktok_url',}),
+			'bio': forms.Textarea(attrs={'class':'bio_input', 'id': 'bio_input',}),
+			'birthdate': forms.TextInput(attrs={'class':'reg_input', 'type': 'date', 'id': 'birthdate_input',}),
+			'city': forms.TextInput(attrs={'class':'reg_input', 'id': 'city_input',}),			
+			'first_name': forms.TextInput(attrs={'class':'reg_input', 'id': 'first_name_input',}),
+			'last_name': forms.TextInput(attrs={'class':'reg_input', 'id': 'last_name_input',}),
+			'sex': forms.Select(attrs={'class':'reg_input', 'id': 'select',}),
+			'link1': forms.URLInput(attrs={'class':'reg_input', 'id': 'vk_url',}),
+			'link2': forms.URLInput(attrs={'class':'reg_input', 'id': 'inst_url',}),
+			'link3': forms.URLInput(attrs={'class':'reg_input', 'id': 'tg_url',}),
+			'link4': forms.URLInput(attrs={'class':'reg_input', 'id': 'tiktok_url',}),
 		}
 
 
@@ -120,9 +133,13 @@ class UserUpdateForm(UserChangeForm):
 	class Meta:
 		model = User
 		fields = ['username', 'email',]
+		widgets = {
+			'username': forms.TextInput(attrs={'class': 'reg_input', 'id': 'profile_pic_input',}),
+			'email': forms.EmailInput(attrs={'class':'reg_input', 'id': 'bio_input',}),
+		}
 
 	def __init__(self, *args, **kwargs):
-		super(UserUpdateForm, self).__init__(*args, **kwargs)
+		super(UserUpdateForm, self).__init__(*args, **kwargs)	
 		self.fields['email'].label = 'Электронная почта'
 		#self.fields['password'].label = ''
 		self.fields['username'].help_text = ''
@@ -134,9 +151,9 @@ class UserUpdateForm(UserChangeForm):
 		email = cleaned_data.get('email')
 		if username is not None and email is not None:
 			if not valid_username(username):
-				self.add_error(None, ValidationError('Имя пользователя может состоять только из латинницы, цифр и символов -_.'))
+				self.add_error('username', ValidationError('Имя пользователя может состоять только из латинницы, цифр и символов -_.'))
 			if not valid_email(email):
-				self.add_error(None, ValidationError('Указан неверный адрес электронной почты'))
+				self.add_error('email', ValidationError('Вы не указали адрес электронной почты.'))
 
 
 

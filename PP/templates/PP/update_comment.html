@@ -265,5 +265,13 @@
 		<img src="{% static 'PukPok/img/дефолтная-ава.png' %}" alt="" style="margin: 0 32.5% 0 32.3%; width: 400px; padding-bottom: 0">
 	</div>
 	{% endif %}
+	<script>
+	    var textarea = document.getElementById("text_input");
+	    var heightLimit = 500; /* Maximum height: 200px */
+	    textarea.oninput = function() {
+	      textarea.style.height = ""; /* Reset the height*/
+	      textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
+	    };
+  	</script>
 </main>
 {% endblock %}

@@ -2,11 +2,52 @@
 {% load static %}
 
 {% block title %}
-Друзья
+Подписки
 {% endblock %}
 
 {% block content %}
-<main class="friends_main">
-	<h1 class="h1_friends">Друзья</h1>
+<main class="main_container" style="padding: 9% 0 100% 7%; color: white;">
+	<div class="subs_title">
+		<h1 class="title">Подписки</h1>
+		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ my_subs.count }}</h1>
+	</div>
+	<br>
+	{% for sub in my_subs %}
+		<div class="sub_card">
+			<div class="sub_card_header">
+				<div class="pic_username_flex">
+					<a href="{% url 'profile_page' sub.id %}"><img class="profile_pic" style="margin: 10px 15px" src="{{ sub.profile_pic.url }}" alt=""></a>
+					<h5 class="sub_username">
+						<a class="sub_username_link" href="{% url 'profile_page' sub.id %}">{{ sub.user.username }}</a>
+						<p class="online">
+							{% if sub.is_online == 1 %}
+					        {{ sub.define_sex }} сегодня в {{ sub.last_active|date:"H:i" }}
+					        {% elif sub.is_online == 2 %}
+					        {{ sub.define_sex }} вчера в {{ sub.last_active|date:"H:i" }}
+					        {% elif sub.is_online == 3 %}
+					        {{ sub.define_sex }} позавчера в {{ sub.last_active|date:"H:i" }}
+					        {% elif sub.is_online == 4 %}
+					        {{ sub.define_sex }} {{ sub.last_active|date:"j E в H:i" }}
+					        {% elif sub.is_online == 5 %}
+					        {{ sub.define_sex }} {{ sub.last_active|date:"j E y" }}
+					        {% else %}
+					        {{ sub.is_online }}
+					        {% endif %}
+						</p>
+					</h5>
+				</div>
+				<form action="{% url 'subscribe_profile' sub.pk %}" method="POST" class="unsub_form">
+		            {% csrf_token %}
+		            <button type="submit" name="profile_id" value="{{ sub.id }}" class="btn btn-outline-light btn-sm" style="margin-right: 15px; width: 80px; height: 25px; font-size: 11px; padding: auto;">Отписаться</button>
+		        </form>
+	        </div>
+	        <div class="sub_info">
+	        	{% if sub.city %}
+		    	<p class="sub_city"><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ sub.city }}</p>
+		    	{% endif %}
+		    </div>
+		</div>
+		<br>
+	{% endfor %}
 </main>
 {% endblock %}

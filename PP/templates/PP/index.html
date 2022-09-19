@@ -107,7 +107,7 @@ PukPok
               <p class="p_comments">{{ post.comments.count }} {{ post.total_comments }}</p>
               <hr>
               {% if post.comments.all %}
-              {% for comment in post.comments.order_by %}
+              {% for comment in post.comments.all %}
               <div class="comments">
                 <div class="whole_comments">
                   <div class="profile_pic_comments">

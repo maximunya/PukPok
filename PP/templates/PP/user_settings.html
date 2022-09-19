@@ -11,7 +11,7 @@
 		{% if user.is_authenticated %}
 		{% if request.user.id == user.pk %}
 		<h1 class="title">Настройки аккаунта</h1>
-		<form method="post">
+		<form class="user_settings_form" method="post">
 			{% csrf_token %}
 			{{ form.as_p }}
 			<button class="btn btn-light">Сохранить</button>
