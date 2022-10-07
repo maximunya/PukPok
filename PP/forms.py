@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserChangeForm
-from .models import Post, Comment, Profile
+from .models import Post, Comment, Profile, PostImage
 from ckeditor.widgets import CKEditorWidget
 import re
 from django.core.exceptions import ValidationError
@@ -64,7 +64,7 @@ class CommentForm(forms.ModelForm):
 		fields = ['post', 'comment_text', 'author']
 		widgets = {
 			'post': forms.TextInput(attrs={'class': 'comment_input', 'value': '', 'id': 'post', 'type': 'hidden',}),
-			'comment_text': forms.Textarea(attrs={'class': 'comment_input', 'autofocus': 'on', 'placeholder': 'Напишите комментарий', 'id': 'text_input',}),
+			'comment_text': forms.Textarea(attrs={'class': 'comment_input', 'placeholder': 'Напишите комментарий', 'id': 'text_input',}),
 			'author': forms.TextInput(attrs={'class': 'form-control', 'value': '', 'id': 'author', 'type': 'hidden',})
 		}
 		
@@ -73,17 +73,29 @@ class CommentForm(forms.ModelForm):
 		self.fields['comment_text'].label = ''
 
 
+class ProfilePicForm(forms.ModelForm):
+
+	class Meta:
+		model = Profile
+		fields = [
+			'profile_pic',
+		]
+
+	def __init__(self, *args, **kwargs):
+		super(ProfilePicForm, self).__init__(*args, **kwargs)
+		self.fields['profile_pic'].label = 'Картинка профиля'
+
+
 class ProfileForm(forms.ModelForm):
 
 	class Meta:
 		model = Profile
 		fields = [
-			'profile_pic', 'bio', 'birthdate', 'city',
+			'bio', 'birthdate', 'city',
 			'first_name', 'last_name', 'sex',
 			'link1', 'link2', 'link3', 'link4',
 		]
 		widgets = {
-			#'profile_pic': forms.FileInput(attrs={'class': 'profile_pic_input', 'id': 'profile_pic_input',}),
 			'bio': forms.Textarea(attrs={'class':'bio_input', 'id': 'bio_input',}),
 			'birthdate': forms.TextInput(attrs={'class':'reg_input', 'type': 'date', 'id': 'birthdate_input',}),
 			'city': forms.TextInput(attrs={'class':'reg_input', 'id': 'city_input',}),			
@@ -99,7 +111,6 @@ class ProfileForm(forms.ModelForm):
 
 	def __init__(self, *args, **kwargs):
 		super(ProfileForm, self).__init__(*args, **kwargs)
-		self.fields['profile_pic'].label = 'Картинка профиля'
 		self.fields['bio'].label = 'Био'
 		self.fields['birthdate'].label = 'Дата рождения'
 		self.fields['city'].label = 'Город'
@@ -156,8 +167,12 @@ class UserUpdateForm(UserChangeForm):
 				self.add_error('email', ValidationError('Вы не указали адрес электронной почты.'))
 
 
-
-
+class PostImagesForm(forms.ModelForm):
+	image = forms.ImageField()
+	class Meta:
+		model = PostImage
+		fields = ['image',]
+		
 
 
 

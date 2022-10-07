@@ -47,7 +47,7 @@
                 <button type="submit" name="post_id" value="{{ comment.post.id }}" class="like_post">❤</button>
                 {% endif %}
 	            <div class="total_likes">
-	              {{ comment.post.total_likes }}
+	              <a href="{% url 'liked_post_list' comment.post.pk %}" class="likes_amount_url">{{ comment.post.total_likes }}</a>
 	            </div>
 	          </form>
 	        </div>
@@ -158,7 +158,7 @@
 	                  </button>
 	                {% endif %}
 	                  <div class="comment_total_likes">
-	                    {{ comment.total_likes }}
+	                    <a href="{% url 'liked_comment_list' comment.pk %}" class="likes_amount_url">{{ comment.total_likes }}</a>
 	                  </div>
 	                </form>
 	              </div>
@@ -213,7 +213,7 @@
 	                  </button>
 	                {% endif %}
 	                  <div class="comment_total_likes">
-	                    {{ comment.total_likes }}
+	                    <a href="{% url 'liked_comment_list' comment.pk %}" class="likes_amount_url">{{ comment.total_likes }}</a>
 	                  </div>
 	                </form>
 	              </div>

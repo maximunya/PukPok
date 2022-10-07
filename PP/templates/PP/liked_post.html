@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Лайки
+{% endblock %}
+
+{% block content %}
+<main class="main_container" style="padding: 9% 0 100% 7%; color: white;">
+	<div class="subs_title">
+		<h1 class="title">Лайки</h1>
+		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ users_liked.count }}</h1>
+	</div>
+	<br>
+	{% for user_liked in users_liked %}
+		<div class="sub_card">
+			<div class="sub_card_header">
+				<div class="pic_username_flex">
+					<a href="{% url 'profile_page' user_liked.profile.id %}"><img class="profile_pic" style="margin: 10px 15px" src="{{ user_liked.profile.profile_pic.url }}" alt=""></a>
+					<h5 class="sub_username">
+						<a class="sub_username_link" href="{% url 'profile_page' user_liked.profile.id %}">{{ user_liked.username }}</a>
+						<p class="online">
+							{% if user_liked.profile.is_online == 1 %}
+					        {{ user_liked.profile.define_sex }} сегодня в {{ user_liked.profile.last_active|date:"H:i" }}
+					        {% elif user_liked.profile.is_online == 2 %}
+					        {{ user_liked.profile.define_sex }} вчера в {{ user_liked.profile.last_active|date:"H:i" }}
+					        {% elif user_liked.profile.is_online == 3 %}
+					        {{ user_liked.profile.define_sex }} позавчера в {{ user_liked.profile.last_active|date:"H:i" }}
+					        {% elif user_liked.profile.is_online == 4 %}
+					        {{ user_liked.profile.define_sex }} {{ user_liked.profile.last_active|date:"j E в H:i" }}
+					        {% elif user_liked.profile.is_online == 5 %}
+					        {{ user_liked.profile.define_sex }} {{ user_liked.profile.last_active|date:"j E y" }}
+					        {% else %}
+					        {{ user_liked.profile.is_online }}
+					        {% endif %}
+						</p>
+					</h5>
+				</div>
+	        </div>
+	        <div class="sub_info">
+	        	{% if user_liked.profile.city %}
+		    	<p class="sub_city"><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ user_liked.profile.city }}</p>
+		    	{% endif %}
+		    </div>
+		</div>
+		<br>
+	{% endfor %}
+</main>
+{% endblock %}

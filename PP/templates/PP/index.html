@@ -59,6 +59,15 @@ PukPok
                 {% endif %}
               </div>
               <p class="post_content"><a href="{% url 'post_detail' post.pk %}" class="a_post_detail">{{ post.content|linebreaks }}</a></p>
+              {% if post.post_images.all %}
+              <div class="post_images">
+                {% for image in post.post_images.all %}
+                <div class="post_image">
+                  <img src="{{ image.image.url }}" alt="">
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
               <div class="post_info">
                 <div class="post_likes">
                   <form action="{% url 'like_post' post.pk %}" method="POST" class="likes_info">
@@ -69,7 +78,7 @@ PukPok
                     <button type="submit" name="post_id" value="{{ post.id }}" class="like_post">❤</button>
                     {% endif %}
                     <div class="total_likes">
-                      {{ post.total_likes }}
+                      <a href="{% url 'liked_post_list' post.pk %}" class="likes_amount_url">{{ post.total_likes }}</a>
                     </div>
                   </form>
                 </div>
@@ -179,7 +188,7 @@ PukPok
                           </button>
                         {% endif %}
                           <div class="comment_total_likes">
-                            {{ comment.total_likes }}
+                            <a href="{% url 'liked_comment_list' comment.pk %}" class="likes_amount_url">{{ comment.total_likes }}</a>
                           </div>
                         </form>
                       </div>

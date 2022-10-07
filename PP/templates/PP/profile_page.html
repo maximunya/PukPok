@@ -61,29 +61,34 @@
         <div class="pic_and_bio">
           <div class="div_profile_page_picture">
           {% if page_user.profile_pic %}
-            <img class="profile_page_picture" src="{{ page_user.profile_pic.url }}" alt="-">
+            <a href="{{ page_user.profile_pic.url }}"><img class="profile_page_picture" src="{{ page_user.profile_pic.url }}" alt="-"></a>
           {% else %}
-            <img class="profile_page_picture" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-">
+            <a href="{{ page_user.profile_pic.url }}"><img class="profile_page_picture" src="{% static 'PukPok/img/дефолтная-ава.jpeg' %}" alt="-"></a>
           {% endif %}
-          {% if user.profile.id != page_user.id %}
-          <form action="{% url 'subscribe_profile' page_user.pk %}" method="POST" class="subscribe_form">
-            {% csrf_token %}
-            {% if user in page_user.subscribers.all %}
-            <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-outline-light btn-sm" style="margin: auto; display: block; width: 150px;">Вы подписаны</button>
+          {% if user.is_authenticated %}
+            {% if user.profile.id != page_user.id %}
+            <form action="{% url 'subscribe_profile' page_user.pk %}" method="POST" class="subscribe_form">
+              {% csrf_token %}
+              {% if user in page_user.subscribers.all %}
+              <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-outline-light btn-sm" style="margin: auto; display: block; width: 150px;">Вы подписаны</button>
+              {% else %}
+              <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-primary btn-sm" style="margin: auto; display: block; width: 150px;">Подписаться</button>
+              {% endif %}
+            </form>
             {% else %}
-            <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-primary btn-sm" style="margin: auto; display: block; width: 150px;">Подписаться</button>
+            <a style="margin: 10px auto; display: block; width: 200px;" href="{% url 'edit_profile_pic' request.user.profile.id %}" class="btn btn-secondary btn-sm">Изменить картинку</a>
             {% endif %}
           {% endif %}
-          </form>
+          
           <div class="profile_subs_info">
-            <div class="subscribers_amount">
+            <a class="sub_link" href="{% url 'subscribers_list' page_user.pk %}"><div class="subscribers_amount">
               <h5 class="number">{{ subscribers_amount }}</h5>
               <p class="subscribers_word">Подписчики</p>
-            </div>
-            <div class="subs_amount">
+            </div></a>
+            <a class="sub_link" href="{% url 'subscribes_list' page_user.pk %}"><div class="subs_amount">
               <h5 class="number">{{ subs_amount }}</h5>
               <p class="subs_word">Подписки</p>
-            </div>
+            </div></a>
           </div>
           </div>
           <div class="bio_and_links">
@@ -112,8 +117,7 @@
             {% endif %}
             {% if user.is_authenticated %}
               {% if user.profile.id == page_user.id %}
-              <a class="btn btn-light btn-sm mr-1" href="{% url 'edit_profile' request.user.profile.id %}">Изменить профиль</a>
-              <a class="btn btn-secondary btn-sm mr-1" href="{% url 'user_settings' request.user.id %}">Настройки аккаунта</a>
+              <a style="font-size: 12px;" class="btn btn-primary btn-sm mr-1" href="{% url 'edit_profile' request.user.profile.id %}">Редактировать</a>
               {% endif %}
             {% endif %}
           </div>
@@ -128,8 +132,8 @@
         <div class="post_form">
           <form class="form" enctype='multipart/form-data' style="width: 103%;" action="{% url 'create_post' %}" method="post">
             {% csrf_token %}
-            {{ create_post_form.media }}
             {{ create_post_form }}
+            {{ post_images_form }}
             <button type="submit" class="btn btn-light btn-block" style="margin-top: 5px; width: 15%; text-align: center; margin-left: 85%; margin-bottom: 5%;" >Запостить</button>
           </form>
 
@@ -187,7 +191,7 @@
                       <button type="submit" name="post_id" value="{{ post.id }}" class="like_post">❤</button>
                       {% endif %}
                       <div class="total_likes">
-                        {{ post.total_likes }}
+                        <a href="{% url 'liked_post_list' post.pk %}" class="likes_amount_url">{{ post.total_likes }}</a>
                       </div>
                     </form>
                   </div>
@@ -297,7 +301,7 @@
                             </button>
                           {% endif %}
                             <div class="comment_total_likes">
-                              {{ comment.total_likes }}
+                              <a href="{% url 'liked_comment_list' comment.pk %}" class="likes_amount_url">{{ comment.total_likes }}</a>
                             </div>
                           </form>
                         </div>

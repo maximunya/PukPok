@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Подписки
+Подписки {{ profile.user.username }}
 {% endblock %}
 
 {% block content %}
@@ -36,10 +36,12 @@
 						</p>
 					</h5>
 				</div>
+				{% if user.profile.id == profile.id %}
 				<form action="{% url 'subscribe_profile' sub.pk %}" method="POST" class="unsub_form">
 		            {% csrf_token %}
 		            <button type="submit" name="profile_id" value="{{ sub.id }}" class="btn btn-outline-light btn-sm" style="margin-right: 15px; width: 80px; height: 25px; font-size: 11px; padding: auto;">Отписаться</button>
 		        </form>
+		        {% endif %}
 	        </div>
 	        <div class="sub_info">
 	        	{% if sub.city %}

@@ -46,17 +46,21 @@
 		<div class="left_bar">
       		<div class="left_bar_section">
       		{% if request.user.is_authenticated %}
-      			<div class="bar_item_container"><a class="left_bar_item1" href="{% url 'profile_page' request.user.profile.id %}">Моя страница</a></div>
+      			<div class="bar_item_container"><a class="left_bar_item1" href="{% url 'profile_page' request.user.profile.id %}">Мой профиль</a></div>
       			<div class="bar_item_container"><a class="left_bar_item2" href="{% url 'index' %}">Лента</a></div>
-      			<div class="bar_item_container"><a class="left_bar_item3" href="{% url 'friends' %}">Подписки</a></div>
+      			<div class="bar_item_container"><a class="left_bar_item3" href="{% url 'subscribes_list' user.profile.pk %}">Подписки</a></div>
       		{% else %}
-      			<div class="bar_item_container"><a class="left_bar_item1" href="{% url 'login' %}">Моя страница</a></div>
+      			<div class="bar_item_container"><a class="left_bar_item1" href="{% url 'login' %}">Мой профиль</a></div>
       			<div class="bar_item_container"><a class="left_bar_item2" href="{% url 'index' %}">Лента</a></div>
       			<div class="bar_item_container"><a class="left_bar_item3" href="{% url 'login' %}">Подписки</a></div>
       		{% endif %}
     		</div>
     		<div class="left_bar_section2">
-        		<div class="bar_item_container1"><a class="left_bar_item4" href="#">Настройки</a></div> 
+    			{% if user.is_authenticated %}
+        		<div class="bar_item_container1"><a class="left_bar_item4" href="{% url 'user_settings' request.user.id %}">Настройки</a></div> 
+    			{% else %}
+    			<div class="bar_item_container1"><a class="left_bar_item4" href="#">Настройки</a></div>
+    			{% endif %}
     		</div>
   		</div>
   		<div class="submain">

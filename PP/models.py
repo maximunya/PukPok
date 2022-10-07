@@ -217,6 +217,7 @@ class Post(models.Model):
 	likes = models.ManyToManyField(User, blank=True, related_name='blog_posts')
 	total_likes = models.IntegerField(default=0)
 
+
 	def mytime(self):
 		if tz.now() < self.posted_at + timedelta(seconds=10):
 			return 'Только что'
@@ -621,3 +622,12 @@ class Comment(models.Model):
 		verbose_name = 'Комментарий'
 		verbose_name_plural = 'Комментарии'
 		ordering = ['comment_posted_at']
+
+
+class PostImage(models.Model):
+	post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_images')
+	image = models.ImageField(blank=True, upload_to="post_images/",)
+
+
+
+

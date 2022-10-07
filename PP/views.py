@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Post, Comment, Profile
-from .forms import RegisterForm, UserLoginForm, PostForm, CommentForm, ProfileForm, UserUpdateForm
+from .forms import RegisterForm, UserLoginForm, PostForm, CommentForm, ProfileForm, ProfilePicForm, UserUpdateForm, PostImagesForm
 from django.contrib.auth import login as auth_login, logout
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
@@ -93,7 +93,7 @@ def index(request):
 		user = User.objects.select_related('profile').get(pk=request.user.id)
 		user.profile.last_active = datetime.now()
 		user.save()
-	posts = Post.objects.prefetch_related('comments__author__profile').select_related('author__profile').prefetch_related("likes").prefetch_related('comments__likes').all()
+	posts = Post.objects.prefetch_related('comments__author__profile').select_related('author__profile').prefetch_related("likes").prefetch_related('comments__likes').prefetch_related('post_images').filter(is_published=True)
 	context = {
 		'posts': posts,
 	}
@@ -215,7 +215,7 @@ class ProfilePage(DetailView):
 		profile = Profile.objects.get(id=self.kwargs['pk'])
 		user_id = profile.user_id
 		
-		posts = Post.objects.prefetch_related('comments__author__profile').select_related('author__profile').prefetch_related("likes").prefetch_related('comments__likes').filter(author_id=user_id)
+		posts = Post.objects.prefetch_related('comments__author__profile').select_related('author__profile').prefetch_related("likes").prefetch_related('comments__likes').filter(author_id=user_id).filter(is_published=True)
 		posts_amount = posts.count()
 		subscribers_amount = profile.subscribers.count()
 		subs_amount = Profile.objects.select_related('user').filter(subscribers=user_id).count()
@@ -243,6 +243,7 @@ class ProfilePage(DetailView):
 				total_posts = f"{posts_amount} постов"
 		page_user = get_object_or_404(Profile, id=self.kwargs['pk'])
 		context['create_post_form'] = PostForm()
+		context['post_images_form'] = PostImagesForm()
 		context["page_user"] = page_user
 		context["posts"] = posts
 		context['total_posts'] = total_posts
@@ -251,20 +252,62 @@ class ProfilePage(DetailView):
 		return context
 	
 
-@login_required
-def friends(request):
+def subscribes(request, pk):
 	if request.user.is_authenticated:
 		user = User.objects.select_related("profile").get(pk=request.user.id)
 		user.profile.last_active = datetime.now()
 		user.save()
 
-	my_subs = Profile.objects.select_related('user').filter(subscribers=request.user)
+	profile = Profile.objects.select_related('user').get(id=pk)
+	my_subs = Profile.objects.select_related('user').filter(subscribers=profile.user.id)
 
 	context = {
 		'my_subs': my_subs,
-		#'sub_subs': sub_subs,
+		'profile': profile,
 	}
-	return render(request, "PP/friends.html", context)
+	return render(request, "PP/subscribes.html", context)
+
+
+def subscribers(request, pk):
+	if request.user.is_authenticated:
+		user = User.objects.select_related("profile").get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	profile = Profile.objects.prefetch_related("subscribers").select_related('user').get(id=pk)
+	subscribers = profile.subscribers.select_related('profile').all()
+
+	context = {
+		'profile': profile,
+		'subscribers': subscribers,
+	}
+	return render(request, "PP/subscribers.html", context)
+
+
+def liked_post(request, pk):
+	if request.user.is_authenticated:
+		user = User.objects.select_related("profile").get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+	post = Post.objects.prefetch_related("likes").select_related('author').get(id=pk)
+	users_liked = post.likes.select_related('profile').all()
+	context = {
+		'users_liked': users_liked,
+	}
+	return render(request, "PP/liked_post.html", context)
+
+
+def liked_comment(request, pk):
+	if request.user.is_authenticated:
+		user = User.objects.select_related("profile").get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+	comment = Comment.objects.prefetch_related("likes").select_related('author').get(id=pk)
+	users_liked = comment.likes.select_related('profile').all()
+	context = {
+		'users_liked': users_liked,
+	}
+	return render(request, "PP/liked_comment.html", context)
 
 
 class UpdatePostView(LoggedAndPassedTestPostMixin, UpdateView):
@@ -285,6 +328,24 @@ class UpdatePostView(LoggedAndPassedTestPostMixin, UpdateView):
 		return reverse_lazy('post_detail', kwargs={'pk': self.object.id})
 
 
+class UpdateProfilePicView(LoggedAndPassedTestProfileMixin, UpdateView):
+	model = Profile
+	form_class = ProfilePicForm
+	template_name = 'PP/edit_profile_pic.html'
+
+	def get_context_data(self, *args, **kwargs):
+		context = super(UpdateProfilePicView, self).get_context_data(*args, **kwargs)
+		if self.request.user.is_authenticated:
+			user = User.objects.get(pk=self.request.user.id)
+			user.profile.last_active = datetime.now()
+			user.save()
+		return context
+
+	def get_success_url(self, **kwargs):
+		messages.success(self.request, 'Информация профиля изменена.')
+		return reverse_lazy('profile_page', kwargs={'pk': self.request.user.profile.id})
+
+
 class UpdateProfileView(LoggedAndPassedTestProfileMixin, UpdateView):
 	model = Profile
 	form_class = ProfileForm
@@ -300,7 +361,7 @@ class UpdateProfileView(LoggedAndPassedTestProfileMixin, UpdateView):
 
 	def get_success_url(self, **kwargs):
 		messages.success(self.request, 'Информация профиля изменена.')
-		return reverse_lazy('profile_page', kwargs={'pk': self.request.user.id})
+		return reverse_lazy('profile_page', kwargs={'pk': self.request.user.profile.id})
 
 
 class UpdateUserView(LoggedAndPassedTestUserMixin, UpdateView):
@@ -318,7 +379,7 @@ class UpdateUserView(LoggedAndPassedTestUserMixin, UpdateView):
 
 	def get_success_url(self, **kwargs):
 		messages.success(self.request, 'Данные вашего аккаунта изменены.')
-		return reverse_lazy('profile_page', kwargs={'pk': self.request.user.id})
+		return reverse_lazy('profile_page', kwargs={'pk': self.request.user.profile.id})
 
 
 @login_required

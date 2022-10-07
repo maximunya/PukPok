@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Подписчики {{ profile.user.username }}
+{% endblock %}
+
+{% block content %}
+<main class="main_container" style="padding: 9% 0 100% 7%; color: white;">
+	<div class="subs_title">
+		<h1 class="title">Подписчики</h1>
+		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ subscribers.count }}</h1>
+	</div>
+	<br>
+	{% for sub in subscribers %}
+		<div class="sub_card">
+			<div class="sub_card_header">
+				<div class="pic_username_flex">
+					<a href="{% url 'profile_page' sub.profile.id %}"><img class="profile_pic" style="margin: 10px 15px" src="{{ sub.profile.profile_pic.url }}" alt=""></a>
+					<h5 class="sub_username">
+						<a class="sub_username_link" href="{% url 'profile_page' sub.profile.id %}">{{ sub.username }}</a>
+						<p class="online">
+							{% if sub.profile.is_online == 1 %}
+					        {{ sub.profile.define_sex }} сегодня в {{ sub.profile.last_active|date:"H:i" }}
+					        {% elif sub.profile.is_online == 2 %}
+					        {{ sub.profile.define_sex }} вчера в {{ sub.profile.last_active|date:"H:i" }}
+					        {% elif sub.profile.is_online == 3 %}
+					        {{ sub.profile.define_sex }} позавчера в {{ sub.profile.last_active|date:"H:i" }}
+					        {% elif sub.profile.is_online == 4 %}
+					        {{ sub.profile.define_sex }} {{ sub.profile.last_active|date:"j E в H:i" }}
+					        {% elif sub.profile.is_online == 5 %}
+					        {{ sub.profile.define_sex }} {{ sub.profile.last_active|date:"j E y" }}
+					        {% else %}
+					        {{ sub.profile.is_online }}
+					        {% endif %}
+						</p>
+					</h5>
+				</div>
+	        </div>
+	        <div class="sub_info">
+	        	{% if sub.profile.city %}
+		    	<p class="sub_city"><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ sub.profile.city }}</p>
+		    	{% endif %}
+		    </div>
+		</div>
+		<br>
+	{% endfor %}
+</main>
+{% endblock %}

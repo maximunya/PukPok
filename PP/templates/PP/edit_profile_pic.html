@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Изменить картинку
+{% endblock %}
+
+{% block content %}
+<main class="profile_page_main">
+	<div style="padding-bottom: 30%;" class="edit_profile_container">
+		{% if user.is_authenticated %}
+		{% if request.user.profile.id == profile.pk %}
+		<h1 class="title">Изменить картинку</h1>
+		<form class="edit_profile_form" method="post" enctype='multipart/form-data'>
+			{% csrf_token %}
+			{{ form.as_p }}
+			<button class="btn btn-primary btn-sm">
+			Сохранить
+			</button>
+		</form>
+		{% endif %}
+		{% endif %}
+	</div>
+</main>
+{% endblock %}
