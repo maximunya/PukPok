@@ -130,16 +130,15 @@
     {% if user.is_authenticated %}
       {% if user.profile.id == page_user.id %}
         <div class="post_form">
-          <form class="form" enctype='multipart/form-data' style="width: 103%;" action="{% url 'create_post' %}" method="post">
+          <form id="post_form" class="form" enctype='multipart/form-data' style="width: 103%;" method="post">
             {% csrf_token %}
-            {{ create_post_form }}
+            {{ post_form }}
             {{ post_images_form }}
             <button type="submit" class="btn btn-light btn-block" style="margin-top: 5px; width: 15%; text-align: center; margin-left: 85%; margin-bottom: 5%;" >Запостить</button>
           </form>
 
           <script>
-            var name = "{{ user.id }}";
-            document.getElementById("name").value = name;
+            
 
             var textarea = document.getElementById("text_input");
             var heightLimit = 1500; /* Maximum height: 200px */
@@ -181,6 +180,15 @@
                   {% endif %}
                 </div>
                 <p class="post_content"><a href="{% url 'post_detail' post.pk %}" class="a_post_detail">{{ post.content|linebreaks }}</a></p>
+                {% if post.post_images.all %}
+                <div class="post_images">
+                  {% for image in post.post_images.all %}
+                  <div class="post_image">
+                    <a href="{{ image.image.url }}"><img class="img_post_image" src="{{ image.image.url }}" alt=""></a>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
                 <div class="post_info">
                   <div class="post_likes">
                     <form action="{% url 'like_post' post.pk %}" method="POST" class="likes_info">

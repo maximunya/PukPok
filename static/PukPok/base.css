@@ -246,10 +246,11 @@
 }
 
 .profile_picture {
-	width: 28px;
-	height: 27px;
+	width: 29px;
+	height: 29px;
 	border-radius: 50%;
-	margin-right: 6%; 
+	margin-right: 9%;
+	margin-top: -1px; 
 }
 
 .post_author {
@@ -1311,10 +1312,151 @@ ul.errorlist {
 
 .likes_amount_url:hover {
 	color: black;
-	text-decoration: none;
 }
 
 .likes_amount_url:link {
 	color: black;
+}
+
+.img_post_image {
+	max-width: 500px;
+	max-height: 500px; 
+}
+
+.notifications_icon {
+	margin: 1px -6px 0 0;
+}
+
+.note_img {
+	width: 25px;
+}
+
+.notes_amount {
+	margin: 0 0 1px 2.5px;
+	font-size: 10px;
+	color: white;
+	display: block;
+	padding: 0px 2px 2px 2px;
+}
+
+.div_notes_amount {
+	margin: 0 25px 0 5px;
+}
+
+.note_card {
+	background: #333;
+	width: 60%;
+	height: 120px;
+	border-radius: 20px 20px;
+	margin: 0 0 0 13%;
+	border: 1px solid #555;
+	position: relative;
+}
+
+.note_card:hover {
+	background: #222;
+	transition: .2s ease-out;
+}
+
+.wrap {
+	display: inline-block;
+	margin-left: 5px;
+	position: absolute;
+	top: 15%;
+}
+
+.sub_note {
+	margin: auto;
+}
+
+.like_post_note {
+	margin: auto;
+}
+
+.like_comment_note {
+	margin: auto;
+}
+
+.comment_note {
+	margin: auto;
+}
+
+.note_type_img {
+	width: 80px;
+	margin-right: 20px;
+	border-right: 1px solid #777;
+	padding: 10px 20px;
+}
+
+.note_profile_pic {
+	width: 80px;
+	height: 80px;
+	border-radius: 50%;
+	border: 1px solid #222;
+	margin-right: 10px;
+}
+
+.note_username_link {
+	color: white;
+	font-size: 20px;
+	margin: 0;
+	position: absolute;
+	top: 5%;
+	display: flex;
+	margin-left: 195px;
+	width: 400px;
+}
+
+.note_username_link:hover {
+	color: white;
+}
+
+.note_message {
+	margin: -47px 0 0 195px;
+	font-size: 14px;
+
+}
+
+.note_timestamp {
+	margin: 4px 0 0 193px;
+	color: #aaa;
+	font-size: 12px;
+}
+
+.note_message_add {
+	margin: 1px 0 0 195px;
+	font-size: 11px;
+	color: #bbb;
+
+}
+
+.note_timestamp_like_comment {
+	margin: 2px 0 0 193px;
+	color: #aaa;
+	font-size: 12px;
+}
+
+.left_comment {
+	font-size: 14px;
+	margin-left: 7px;
+	margin-top: 4px;
+	color: #aaa;
 	text-decoration: none;
+}
+
+.left_comment:hover {
+	text-decoration: none;
+	color: #aaa;
+}
+
+.hide_note {
+	position: absolute;
+	left: 88%;
+	top: 10%;
+}
+
+.new_notes {
+	position: absolute;
+	left: 29%;
+	font-size: 18px;
 }

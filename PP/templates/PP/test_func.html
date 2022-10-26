@@ -1,0 +1,7 @@
+<div class="post_form">
+  <form id="post_form" class="form" enctype='multipart/form-data' style="width: 103%;" method="post">
+    {% csrf_token %}
+    {{ post_form }}
+    {{ post_images_form }}
+    <button type="submit" class="btn btn-light btn-block" style="margin-top: 5px; width: 15%; text-align: center; margin-left: 85%; margin-bottom: 5%;" >Запостить</button>
+  </form>

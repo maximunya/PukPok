@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Post, Comment, Profile
+from .models import Post, Comment, Profile, PostImage, Notification
 from .forms import RegisterForm, UserLoginForm, PostForm, CommentForm, ProfileForm, ProfilePicForm, UserUpdateForm, PostImagesForm
 from django.contrib.auth import login as auth_login, logout
 from django.http import HttpResponseRedirect
@@ -18,6 +18,8 @@ from .services.update import update_user_profile
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework import permissions
 from datetime import datetime, timedelta
+from django.forms import modelformset_factory
+from django.utils import timezone as tz
 
 
 
@@ -128,6 +130,20 @@ class CreateCommentForm(CreateView):
 	form_class = CommentForm
 	template_name = 'PP/create_comment.html'
 
+	def get_context_data(self, *args, **kwargs):
+		if self.request.user.is_authenticated:
+			user = User.objects.get(pk=self.request.user.id)
+			user.profile.last_active = datetime.now()
+			user.save()
+		super(CreateCommentForm, self).get_context_data(*args, **kwargs)
+
+	def form_valid(self, form):
+		form.instance.user = self.request.user
+		receiver = form.instance.post.author
+		if self.request.user != receiver:
+			Notification.objects.create(receiver=receiver, sender=self.request.user, notification_type='comment', post=form.instance.post, text=form.instance.comment_text)
+		return super().form_valid(form)
+
 
 def register(request):
 	if request.method == 'POST':
@@ -170,9 +186,14 @@ def like(request, pk):
 	liked = False
 	if post.likes.filter(id=request.user.id).exists():
 		post.likes.remove(request.user)
+		notification = Notification.objects.filter(notification_type='like_post', comment_id=None, post_id=post.id, sender_id=user, text=None)
+		notification.delete()
 		liked = False
 	else:
 		post.likes.add(request.user)
+		receiver = post.author
+		if receiver != user:
+			Notification.objects.create(receiver=receiver, sender=user, notification_type='like_post', post=post)
 		liked = True
 
 	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
@@ -188,22 +209,43 @@ def like_comment(request, pk):
 	liked = False
 	if comment.likes.filter(id=request.user.id).exists():
 		comment.likes.remove(request.user)
+		notification = Notification.objects.filter(notification_type='like_comment', comment_id=comment.id, post_id=comment.post.id, sender_id=user, text=None)
+		notification.delete()
 		liked = False
 	else:
 		comment.likes.add(request.user)
+		receiver = comment.author
+		if receiver != user:
+			Notification.objects.create(receiver=receiver, sender=user, notification_type='like_comment', comment=comment, post=comment.post)
 		liked = True
 
 	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
 
-class CreatePostForm(CreateView):
-	form_class = PostForm
-	template_name = 'PP/create_post.html'
-
-
 class ProfilePage(DetailView):
 	model = Profile 
 	template_name = 'PP/profile_page.html'
+	first_form = PostForm()
+	second_form = PostImagesForm()
+
+	def post(self, request, *args, **kwargs):
+		if self.request.method == 'POST':
+			self.first_form = PostForm(data=self.request.POST)
+			self.second_form = PostImagesForm(data=self.request.POST, files=self.request.FILES)
+			post = self.first_form.save(commit=False)
+			post_image = self.second_form.save(commit=False)
+			if post.content or post_image.image:
+				post.author = self.request.user
+				post.save()
+				if post_image.image:
+					post_image.post = post
+					post_image.save()
+				return redirect('profile_page', self.request.user.profile.id)
+			else:
+				return redirect('profile_page', self.request.user.profile.id)
+		else:
+			self.first_form = PostForm()
+			self.second_form = PostImagesForm()
 
 	def get_context_data(self, *args, **kwargs):
 		context = super(ProfilePage, self).get_context_data(*args, **kwargs)
@@ -214,8 +256,8 @@ class ProfilePage(DetailView):
 
 		profile = Profile.objects.get(id=self.kwargs['pk'])
 		user_id = profile.user_id
-		
-		posts = Post.objects.prefetch_related('comments__author__profile').select_related('author__profile').prefetch_related("likes").prefetch_related('comments__likes').filter(author_id=user_id).filter(is_published=True)
+		page_user = get_object_or_404(Profile, id=self.kwargs['pk'])
+		posts = Post.objects.prefetch_related('comments__author__profile').select_related('author__profile').prefetch_related("likes").prefetch_related('comments__likes').prefetch_related('post_images').filter(author_id=user_id).filter(is_published=True)
 		posts_amount = posts.count()
 		subscribers_amount = profile.subscribers.count()
 		subs_amount = Profile.objects.select_related('user').filter(subscribers=user_id).count()
@@ -241,9 +283,9 @@ class ProfilePage(DetailView):
 				total_posts = f"{posts_amount} поста"
 			else:
 				total_posts = f"{posts_amount} постов"
-		page_user = get_object_or_404(Profile, id=self.kwargs['pk'])
-		context['create_post_form'] = PostForm()
-		context['post_images_form'] = PostImagesForm()
+
+		context['post_form'] = self.first_form
+		context['post_images_form'] = self.second_form
 		context["page_user"] = page_user
 		context["posts"] = posts
 		context['total_posts'] = total_posts
@@ -251,6 +293,29 @@ class ProfilePage(DetailView):
 		context['subs_amount'] = subs_amount
 		return context
 	
+
+#def create_post(request):
+#	if request.method == 'POST':
+#		post_form = PostForm(data=request.POST)
+#		post_images_form = PostImagesForm(data=request.POST, files=request.FILES)
+#		if post_form.is_valid() and post_images_form.is_valid():
+#			post = post_form.save(commit=False)
+#			post.author = request.user
+#			post.save()
+#			post_image = post_images_form.save(commit=False)
+#			post_image.post = post
+#			post_image.save()
+#			return redirect('index')
+#	else:
+#		post_form = PostForm()
+#		post_images_form = PostImagesForm()	
+#	
+#	return render(
+#		request,
+#		'PP/test_func.html',
+#		{'post_form': post_form, 'post_images_form': post_images_form}
+#	)
+
 
 def subscribes(request, pk):
 	if request.user.is_authenticated:
@@ -444,14 +509,53 @@ def delete_comment(request, comment_id, post_id):
 		user = User.objects.get(pk=request.user.id)
 		user.profile.last_active = datetime.now()
 		user.save()
+
 	comment = Comment.objects.get(pk=comment_id)
+	comment_timestamp = datetime(
+		year=comment.comment_posted_at.year,
+		month=comment.comment_posted_at.month,
+		day=comment.comment_posted_at.day,
+		hour=comment.comment_posted_at.hour,
+		minute=comment.comment_posted_at.minute,
+		second=comment.comment_posted_at.second,
+		)
 	post = Post.objects.get(pk=post_id)
+	notifications = Notification.objects.filter(
+		notification_type='comment',
+		post_id=comment.post.id,
+		text=comment.comment_text,
+		sender=comment.author
+		)
+	note_timestamp = None
+
 	if request.user == post.author:
 		comment.delete()
+		for note in notifications:
+			note_timestamp = datetime(
+				year=note.timestamp.year,
+				month=note.timestamp.month,
+				day=note.timestamp.day,
+				hour=note.timestamp.hour,
+				minute=note.timestamp.minute,
+				second=note.timestamp.second,
+				)
+			if note_timestamp == comment_timestamp:
+				note.delete()
 		messages.success(request, 'Комментарий удалён.')
 		return redirect('index')
 	elif request.user == comment.author:
 		comment.delete()
+		for note in notifications:
+			note_timestamp = datetime(
+				year=note.timestamp.year,
+				month=note.timestamp.month,
+				day=note.timestamp.day,
+				hour=note.timestamp.hour,
+				minute=note.timestamp.minute,
+				second=note.timestamp.second,
+				)
+			if note_timestamp == comment_timestamp:
+				note.delete()
 		messages.success(request, 'Комментарий удалён.')
 		return redirect('index')
 	else:
@@ -465,14 +569,53 @@ def delete_comment_profile(request, comment_id, post_id):
 		user = User.objects.get(pk=request.user.id)
 		user.profile.last_active = datetime.now()
 		user.save()
+
 	comment = Comment.objects.get(pk=comment_id)
+	comment_timestamp = datetime(
+		year=comment.comment_posted_at.year,
+		month=comment.comment_posted_at.month,
+		day=comment.comment_posted_at.day,
+		hour=comment.comment_posted_at.hour,
+		minute=comment.comment_posted_at.minute,
+		second=comment.comment_posted_at.second,
+		)
 	post = Post.objects.get(pk=post_id)
+	notifications = Notification.objects.filter(
+		notification_type='comment',
+		post_id=comment.post.id,
+		text=comment.comment_text,
+		sender=comment.author
+		)
+	note_timestamp = None
+
 	if request.user == post.author:
 		comment.delete()
+		for note in notifications:
+			note_timestamp = datetime(
+				year=note.timestamp.year,
+				month=note.timestamp.month,
+				day=note.timestamp.day,
+				hour=note.timestamp.hour,
+				minute=note.timestamp.minute,
+				second=note.timestamp.second,
+				)
+			if note_timestamp == comment_timestamp:
+				note.delete()
 		messages.success(request, 'Комментарий удалён.')
 		return redirect(comment)
 	elif request.user == comment.author:
 		comment.delete()
+		for note in notifications:
+			note_timestamp = datetime(
+				year=note.timestamp.year,
+				month=note.timestamp.month,
+				day=note.timestamp.day,
+				hour=note.timestamp.hour,
+				minute=note.timestamp.minute,
+				second=note.timestamp.second,
+				)
+			if note_timestamp == comment_timestamp:
+				note.delete()
 		messages.success(request, 'Комментарий удалён.')
 		return redirect(comment)
 	else:
@@ -502,10 +645,69 @@ def subscribe(request, pk):
 		subscribed = False
 		if profile.subscribers.filter(id=request.user.id).exists():
 			profile.subscribers.remove(request.user)
+			notification = Notification.objects.filter(notification_type='subscribe', comment_id=None, post_id=None, receiver=profile.user, sender=user, text=None)
+			notification.delete()
 			subscribed = False
 		else:
 			profile.subscribers.add(request.user)
+			receiver = profile.user
+			if receiver != user:
+				Notification.objects.create(receiver=receiver, sender=user, notification_type='subscribe')
 			subscribed = True
 
 	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+
+@login_required
+def notifications(request):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	notifications = Notification.objects.filter(receiver_id=request.user)
+	#notes = []
+	for n in notifications:
+		if (tz.now() - timedelta(days=15) > n.timestamp) and n.is_read:
+			n.delete()
+		#else:
+		#	notes.append(n)
+
+	notes = Notification.objects.filter(receiver_id=request.user)
+	new_notes = notes.filter(is_read=False)
+	read_notes = notes.filter(is_read=True)
+
+	context = {
+		#'notes': notes,
+		'new_notes': new_notes,
+		'read_notes': read_notes,
+	}
+
+	for note in new_notes:
+		note.is_read = True
+		note.save()
+	return render(request, 'PP/notifications.html', context)
+
+
+
+@login_required
+def delete_notification(request, pk):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	notification = Notification.objects.get(id=pk)
+	if user == notification.receiver:
+		notification.delete()
+		#messages.success(request, 'Уведомление скрыто.')
+		return redirect('notifications')
+	else:
+		messages.error(request, 'Вы не можете удалить этот объект.')
+		return redirect('index')
+	
+
+
+
+
 

@@ -47,14 +47,15 @@ class PostForm(forms.ModelForm):
 		model = Post
 		fields = ['content', 'author',]
 		widgets = {
-			'content': forms.Textarea(attrs={'class': 'post_input', 'placeholder': 'Поделитесь чем-нибудь с нами!', 'id': 'text_input',}),
+			'content': forms.Textarea(attrs={'class': 'post_input', 'placeholder': 'Поделитесь чем-нибудь с нами!', 'id': 'text_input',},),
 			'author': forms.TextInput(attrs={'class': 'form-control', 'value': '', 'id': 'name', 'type': 'hidden',})
 		}
 
 	def __init__(self, *args, **kwargs):
 		super(PostForm, self).__init__(*args, **kwargs)
 		self.fields['content'].label = ''
-		#self.fields['content'].widget = CKEditorWidget()
+		self.fields['content'].required = False
+
 
 
 class CommentForm(forms.ModelForm):
@@ -168,10 +169,19 @@ class UserUpdateForm(UserChangeForm):
 
 
 class PostImagesForm(forms.ModelForm):
-	image = forms.ImageField()
+
 	class Meta:
 		model = PostImage
 		fields = ['image',]
+		widgets = {
+			'image': forms.FileInput()
+		}
+
+	def __init__(self, *args, **kwargs):
+		super(PostImagesForm, self).__init__(*args, **kwargs)	
+		self.fields['image'].label = ''
+		self.fields['image'].required = False
+		
 		
 
 

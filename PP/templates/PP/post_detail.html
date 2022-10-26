@@ -57,6 +57,15 @@
             {% endif %}
           </div>
 	      <p class="post_content"><a href="{% url 'post_detail' post.pk %}" class="a_post_detail">{{ post.content|linebreaks }}</a></p>
+	      {% if post.post_images.all %}
+          <div class="post_images">
+            {% for image in post.post_images.all %}
+            <div class="post_image">
+              <a href="{{ image.image.url }}"><img class="img_post_image" src="{{ image.image.url }}" alt=""></a>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
 	      <div class="post_info">
 	        <div class="post_likes">
 	          <form action="{% url 'like_post' post.pk %}" method="POST" class="likes_info">

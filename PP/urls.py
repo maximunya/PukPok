@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import ProfilePage, CreatePostForm, CreateCommentForm, PostDetailView
+from .views import ProfilePage, CreateCommentForm, PostDetailView
 from .views import UpdatePostView, UpdateCommentView, UpdateProfilePicView, UpdateProfileView, UpdateUserView
 from rest_framework.routers import SimpleRouter
 
@@ -13,7 +13,6 @@ urlpatterns = [
 	path('like/<int:pk>', views.like, name='like_post'),
 	path('like_comment/<int:pk>', views.like_comment, name='like_comment'),
 	path('user/<int:pk>', ProfilePage.as_view(), name='profile_page'),
-	path('create_post', CreatePostForm.as_view(), name='create_post'),
 	path('create_comment', CreateCommentForm.as_view(), name='create_comment'),
 	path('post/<int:pk>', PostDetailView.as_view(), name='post_detail'),
 	path('post/<int:pk>/edit', UpdatePostView.as_view(), name='update_post'),
@@ -32,5 +31,8 @@ urlpatterns = [
 	path('user/<int:pk>/subscribers', views.subscribers, name='subscribers_list'),
 	path('post/<int:pk>/likes', views.liked_post, name='liked_post_list'),
 	path('comment/<int:pk>/likes', views.liked_comment, name='liked_comment_list'),
+	path('notifications', views.notifications, name='notifications'),
+	path('notifications/delete_notification/<int:pk>', views.delete_notification, name='delete_notification'),
+	#path('test_func', views.create_post, name='test_func'),
 ]
 

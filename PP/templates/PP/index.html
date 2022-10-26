@@ -63,7 +63,7 @@ PukPok
               <div class="post_images">
                 {% for image in post.post_images.all %}
                 <div class="post_image">
-                  <img src="{{ image.image.url }}" alt="">
+                  <a href="{{ image.image.url }}"><img class="img_post_image" src="{{ image.image.url }}" alt=""></a>
                 </div>
                 {% endfor %}
               </div>

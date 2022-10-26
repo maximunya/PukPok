@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Уведомления
+{% endblock %}
+
+{% block content %}
+<main class="main_container" style="padding: 10% 0 100% 7%; color: white;">
+	<div class="subs_title">
+		<h1 class="title" style="margin-left: 31%;">Уведомления</h1>
+	</div>
+	
+	<div class="notifications_list">
+		{% if new_notes %}
+		<div class="new_notes">Новые:</div>
+		<br>
+		<br>
+		{% for new_note in new_notes %}
+		<div class="note_card">
+			<div class="wrap">
+			{% if new_note.notification_type == 'subscribe' %}
+				<div class="sub_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/sub.png' %}" alt="">
+					<a href="{% url 'profile_page' new_note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ new_note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+
+					<a class="note_username_link" href="{% url 'profile_page' new_note.sender.profile.id %}">
+						{{ new_note.sender.username }}
+					</a> 
+					<p class="note_message">{{ new_note.sender.profile.define_sex_for_subscribe_notification }} на вас!</p>
+					{% if new_note.с_mytime1 == 1 %}
+                    <p class="note_timestamp">сегодня в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 2 %}
+                    <p class="note_timestamp">вчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 3 %}
+                    <p class="note_timestamp">позавчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 4 %}
+                    <p class="note_timestamp">{{ new_note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 5 %}
+                    <p class="note_timestamp">{{ new_note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp">{{ new_note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% elif new_note.notification_type == 'like_post' %}
+				<div class="like_post_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/like.png' %}" alt="">
+					<a href="{% url 'profile_page' new_note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ new_note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+					<a class="note_username_link" href="{% url 'profile_page' new_note.sender.profile.id %}">
+						{{ new_note.sender.username }}
+					</a> 
+					<p class="note_message">{{ new_note.sender.profile.define_sex_for_like_notification }} ваш пост: &ensp;<a href="{% url 'post_detail' new_note.post.id %}" class="note_post_content">{{ new_note.post.content|truncatechars:30 }}</a></p>
+					{% if new_note.с_mytime1 == 1 %}
+                    <p class="note_timestamp">сегодня в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 2 %}
+                    <p class="note_timestamp">вчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 3 %}
+                    <p class="note_timestamp">позавчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 4 %}
+                    <p class="note_timestamp">{{ new_note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 5 %}
+                    <p class="note_timestamp">{{ new_note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp">{{ new_note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% elif new_note.notification_type == 'like_comment' %}
+				<div class="like_comment_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/like.png' %}" alt="">
+					<a href="{% url 'profile_page' new_note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ new_note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+					<a class="note_username_link" href="{% url 'profile_page' new_note.sender.profile.id %}">
+						{{ new_note.sender.username }}
+					</a> 
+					<p class="note_message">{{ new_note.sender.profile.define_sex_for_like_notification }} ваш комментарий: &ensp;<a href="{% url 'post_detail' new_note.post.id %}" class="note_post_content">{{ new_note.comment.comment_text|truncatechars:30 }}</a></p>
+					<p class="note_message_add">к посту &ensp;<a href="{% url 'post_detail' new_note.post.id %}" class="note_post_content">{{ new_note.post.content|truncatechars:50 }}</a></p>
+					{% if new_note.с_mytime1 == 1 %}
+                    <p class="note_timestamp_like_comment">сегодня в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 2 %}
+                    <p class="note_timestamp_like_comment">вчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 3 %}
+                    <p class="note_timestamp_like_comment">позавчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 4 %}
+                    <p class="note_timestamp_like_comment">{{ new_note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 5 %}
+                    <p class="note_timestamp_like_comment">{{ new_note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp_like_comment">{{ new_note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% elif new_note.notification_type == 'comment' %}
+				<div class="comment_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/comment.png' %}" alt="">
+					<a href="{% url 'profile_page' new_note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ new_note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+					<a class="note_username_link" href="{% url 'profile_page' new_note.sender.profile.id %}">
+						{{ new_note.sender.username }}
+					</a>
+					<p class="note_message">{{ new_note.sender.profile.define_sex_for_comment_notification }} комментарий: &ensp;<a href="{% url 'post_detail' new_note.post.id %}" class="note_post_content">{{ new_note.text|truncatechars:30 }}</a></p>
+					<p class="note_message_add">к вашему посту: &ensp;<a href="{% url 'post_detail' new_note.post.id %}" class="note_post_content">{{ new_note.post.content|truncatechars:50 }}</a></p>
+					{% if new_note.с_mytime1 == 1 %}
+                    <p class="note_timestamp">сегодня в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 2 %}
+                    <p class="note_timestamp">вчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 3 %}
+                    <p class="note_timestamp">позавчера в {{ new_note.timestamp|date:"H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 4 %}
+                    <p class="note_timestamp">{{ new_note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif new_note.с_mytime1 == 5 %}
+                    <p class="note_timestamp">{{ new_note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp">{{ new_note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% endif %}
+			</div>
+			<div class="hide_note">
+				<a href="{% url 'delete_notification' new_note.pk %}" class="btn btn-primary btn-sm">Скрыть</a>
+			</div>
+		</div>
+		<br>
+		{% endfor %}
+		<br>
+		{% endif %}
+
+
+		{% if read_notes %}
+		<div class="new_notes">Просмотренные:</div>
+		<br>
+		<br>
+		{% for note in read_notes %}
+		<div class="note_card">
+			<div class="wrap">
+			{% if note.notification_type == 'subscribe' %}
+				<div class="sub_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/sub.png' %}" alt="">
+					<a href="{% url 'profile_page' note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+
+					<a class="note_username_link" href="{% url 'profile_page' note.sender.profile.id %}">
+						{{ note.sender.username }}
+					</a> 
+					<p class="note_message">{{ note.sender.profile.define_sex_for_subscribe_notification }} на вас!</p>
+					{% if note.с_mytime1 == 1 %}
+                    <p class="note_timestamp">сегодня в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 2 %}
+                    <p class="note_timestamp">вчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 3 %}
+                    <p class="note_timestamp">позавчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 4 %}
+                    <p class="note_timestamp">{{ note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif note.с_mytime1 == 5 %}
+                    <p class="note_timestamp">{{ note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp">{{ note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% elif note.notification_type == 'like_post' %}
+				<div class="like_post_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/like.png' %}" alt="">
+					<a href="{% url 'profile_page' note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+					<a class="note_username_link" href="{% url 'profile_page' note.sender.profile.id %}">
+						{{ note.sender.username }}
+					</a> 
+					<p class="note_message">{{ note.sender.profile.define_sex_for_like_notification }} ваш пост: &ensp;<a href="{% url 'post_detail' note.post.id %}" class="note_post_content">{{ note.post.content|truncatechars:30 }}</a></p>
+					{% if note.с_mytime1 == 1 %}
+                    <p class="note_timestamp">сегодня в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 2 %}
+                    <p class="note_timestamp">вчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 3 %}
+                    <p class="note_timestamp">позавчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 4 %}
+                    <p class="note_timestamp">{{ note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif note.с_mytime1 == 5 %}
+                    <p class="note_timestamp">{{ note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp">{{ note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% elif note.notification_type == 'like_comment' %}
+				<div class="like_comment_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/like.png' %}" alt="">
+					<a href="{% url 'profile_page' note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+					<a class="note_username_link" href="{% url 'profile_page' note.sender.profile.id %}">
+						{{ note.sender.username }}
+					</a> 
+					<p class="note_message">{{ note.sender.profile.define_sex_for_like_notification }} ваш комментарий: &ensp;<a href="{% url 'post_detail' note.post.id %}" class="note_post_content">{{ note.comment.comment_text|truncatechars:30 }}</a></p>
+					<p class="note_message_add">к посту &ensp;<a href="{% url 'post_detail' note.post.id %}" class="note_post_content">{{ note.post.content|truncatechars:50 }}</a></p>
+					{% if note.с_mytime1 == 1 %}
+                    <p class="note_timestamp_like_comment">сегодня в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 2 %}
+                    <p class="note_timestamp_like_comment">вчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 3 %}
+                    <p class="note_timestamp_like_comment">позавчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 4 %}
+                    <p class="note_timestamp_like_comment">{{ note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif note.с_mytime1 == 5 %}
+                    <p class="note_timestamp_like_comment">{{ note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp_like_comment">{{ note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% elif note.notification_type == 'comment' %}
+				<div class="comment_note">
+					<img class="note_type_img" src="{% static 'PukPok/img/comment.png' %}" alt="">
+					<a href="{% url 'profile_page' note.sender.profile.id %}" class="note_profile_url">
+						<img class="note_profile_pic" src="{{ note.sender.profile.profile_pic.url }}" alt="">
+					</a>
+					<a class="note_username_link" href="{% url 'profile_page' note.sender.profile.id %}">
+						{{ note.sender.username }}
+					</a>
+					<p class="note_message">{{ note.sender.profile.define_sex_for_comment_notification }} комментарий: &ensp;<a href="{% url 'post_detail' note.post.id %}" class="note_post_content">{{ note.text|truncatechars:30 }}</a></p>
+					<p class="note_message_add">к вашему посту: &ensp;<a href="{% url 'post_detail' note.post.id %}" class="note_post_content">{{ note.post.content|truncatechars:50 }}</a></p>
+					{% if note.с_mytime1 == 1 %}
+                    <p class="note_timestamp">сегодня в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 2 %}
+                    <p class="note_timestamp">вчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 3 %}
+                    <p class="note_timestamp">позавчера в {{ note.timestamp|date:"H:i" }}</p>
+                    {% elif note.с_mytime1 == 4 %}
+                    <p class="note_timestamp">{{ note.timestamp|date:"j E в H:i" }}</p>
+                    {% elif note.с_mytime1 == 5 %}
+                    <p class="note_timestamp">{{ note.timestamp|date:"j E Y" }}</p>
+                    {% else %}
+                    <p class="note_timestamp">{{ note.с_mytime1 }}</p>
+                    {% endif %}
+				</div>
+			{% endif %}
+			</div>
+			<div class="hide_note">
+				<a href="{% url 'delete_notification' note.pk %}" class="btn btn-primary btn-sm">Скрыть</a>
+			</div>
+		</div>
+		<br>
+		{% endfor %}
+		<br>
+		{% endif %}
+	</div>
+</main>
+{% endblock %}
