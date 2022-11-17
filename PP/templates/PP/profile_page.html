@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<main class="main_container">
+<main class="main_container" style="padding: 1% 0 0 0%;">
   {% if messages %}
     <div style="margin-bottom: -100px; padding-top: 6%; margin-left: 73%; width: 12.5%; text-align: center; font-size: 12px;" class="profile_message">
     {% for message in messages %}
@@ -117,6 +117,7 @@
             {% endif %}
             {% if user.is_authenticated %}
               {% if user.profile.id == page_user.id %}
+              <br>
               <a style="font-size: 12px;" class="btn btn-primary btn-sm mr-1" href="{% url 'edit_profile' request.user.profile.id %}">Редактировать</a>
               {% endif %}
             {% endif %}
@@ -126,15 +127,15 @@
     </div>
   </div>
   <div class="page_content" style="padding-bottom: 20%; margin-bottom: 0;">
-    <p style="color: white; margin-left: 15%;">{{ total_posts }}</p>
     {% if user.is_authenticated %}
       {% if user.profile.id == page_user.id %}
-        <div class="post_form">
-          <form id="post_form" class="form" enctype='multipart/form-data' style="width: 103%;" method="post">
+        <div class="post_form" style='display:flex;'>
+          <a href="{{ page_user.id }}"><img class="form_profile_picture" src="{{ page_user.profile_pic.url }}" alt="-"></a>
+          <form id="post_form" class="form" enctype='multipart/form-data' style="width: 800px;" method="post">
             {% csrf_token %}
             {{ post_form }}
             {{ post_images_form }}
-            <button type="submit" class="btn btn-light btn-block" style="margin-top: 5px; width: 15%; text-align: center; margin-left: 85%; margin-bottom: 5%;" >Запостить</button>
+            <button type="submit" class="btn btn-dark btn-sm" style="margin-top: -30px; width: 15%; text-align: center; margin-left: 84%; margin-bottom: 5%;" >Запостить</button>
           </form>
 
           <script>
@@ -155,7 +156,7 @@
     <div style="padding-bottom: 1%; margin-bottom: 0;" class="posts">
           {% for post in posts %}
           <div class="post" style="width: 103%;">
-            <div class="whole_post">
+            <div class="whole_post" style="margin-left: 30px;">
               <div class="profile_pic">
                 <a href="{% url 'profile_page' post.author.profile.id %}">
                   {% if post.author.profile.profile_pic %}

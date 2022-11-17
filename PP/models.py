@@ -4,14 +4,11 @@ from django.urls import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import timedelta, datetime, date
+from datetime import timedelta, datetime
 from django.utils import timezone as tz
 from django.utils import dateformat
 import pytz
-from ckeditor.fields import RichTextField
 from PukPok import settings
-
-
 
 
 class Profile(models.Model):
@@ -207,7 +204,7 @@ class Profile(models.Model):
 		month1 = int(lst1[1])
 		year1 = int(lst1[0])
 
-		if tz.now() < self.last_active + timedelta(hours=4): 
+		if tz.now() < self.last_active + timedelta(hours=4):
 			return self.online()
 		elif date == date1 and month == month1 and year == year1:
 			return 1
@@ -219,17 +216,17 @@ class Profile(models.Model):
 			return 4
 		elif year > year1:
 			return 5
-		
+
 
 @receiver(post_save, sender=User)
 def save_or_create_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-    else:
-        try:
-            instance.profile.save()
-        except ObjectDoesNotExist:
-            Profile.objects.create(user=instance)
+	if created:
+		Profile.objects.create(user=instance)
+	else:
+		try:
+			instance.profile.save()
+		except ObjectDoesNotExist:
+			Profile.objects.create(user=instance)
 
 
 class Post(models.Model):
@@ -240,7 +237,6 @@ class Post(models.Model):
 	is_published = models.BooleanField(default=True)
 	likes = models.ManyToManyField(User, blank=True, related_name='blog_posts')
 	total_likes = models.IntegerField(default=0)
-
 
 	def mytime(self):
 		if tz.now() < self.posted_at + timedelta(seconds=10):
@@ -381,7 +377,6 @@ class Post(models.Model):
 			return '3 часа назад'
 
 	def mytime1(self):
-
 		now = datetime.now(pytz.timezone('Europe/Moscow'))
 		lst = now.strftime('%Y-%m-%d').split("-")
 		date = int(lst[2])
@@ -394,7 +389,7 @@ class Post(models.Model):
 		month1 = int(lst1[1])
 		year1 = int(lst1[0])
 
-		if tz.now() < self.posted_at + timedelta(hours=4): 
+		if tz.now() < self.posted_at + timedelta(hours=4):
 			return self.mytime()
 		elif date == date1 and month == month1 and year == year1:
 			return 1
@@ -449,6 +444,7 @@ class Post(models.Model):
 		verbose_name = 'Пост'
 		verbose_name_plural = 'Посты'
 		ordering = ['-posted_at']
+
 
 class Comment(models.Model):
 	author = models.ForeignKey(User, blank=False, default=1, on_delete=models.CASCADE)
@@ -612,7 +608,7 @@ class Comment(models.Model):
 		month1 = int(lst1[1])
 		year1 = int(lst1[0])
 
-		if tz.now() < self.comment_posted_at + timedelta(hours=4): 
+		if tz.now() < self.comment_posted_at + timedelta(hours=4):
 			return self.с_mytime()
 		elif date == date1 and month == month1 and year == year1:
 			return 1
@@ -631,7 +627,6 @@ class Comment(models.Model):
 		else:
 			return False
 
-
 	def total_likes(self):
 		return self.likes.count()
 
@@ -640,7 +635,6 @@ class Comment(models.Model):
 
 	def get_absolute_url(self):
 		return reverse('post_detail', kwargs={'pk': self.post.pk})
-
 
 	class Meta:
 		verbose_name = 'Комментарий'
@@ -670,7 +664,7 @@ class Notification(models.Model):
 	post = models.ForeignKey(Post, on_delete=models.CASCADE, blank=True, null=True,)
 	comment = models.ForeignKey(Comment, on_delete=models.CASCADE, blank=True, null=True,)
 	text = models.CharField(max_length=300, blank=True, null=True,)
-	
+
 	class Meta:
 		verbose_name = 'Уведомление'
 		verbose_name_plural = 'Уведомления'
@@ -815,7 +809,6 @@ class Notification(models.Model):
 			return '3 часа назад'
 
 	def с_mytime1(self):
-
 		now = datetime.now(pytz.timezone('Europe/Moscow'))
 		lst = now.strftime('%Y-%m-%d').split("-")
 		date = int(lst[2])
@@ -828,7 +821,7 @@ class Notification(models.Model):
 		month1 = int(lst1[1])
 		year1 = int(lst1[0])
 
-		if tz.now() < self.timestamp + timedelta(hours=4): 
+		if tz.now() < self.timestamp + timedelta(hours=4):
 			return self.с_mytime()
 		elif date == date1 and month == month1 and year == year1:
 			return 1
@@ -841,6 +834,6 @@ class Notification(models.Model):
 		elif year > year1:
 			return 5
 
-	def is_notification_unread(self):
+	def is_new(self):
 		if tz.now() < self.edit_time + timedelta(seconds=3):
 			return True

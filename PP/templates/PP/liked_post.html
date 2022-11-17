@@ -6,9 +6,9 @@
 {% endblock %}
 
 {% block content %}
-<main class="main_container" style="padding: 9% 0 100% 7%; color: white;">
+<main class="main_container" style="padding: 9% 0 50% 7%; color: white;">
 	<div class="subs_title">
-		<h1 class="title">Лайки</h1>
+		<h1 class="title" style='margin-left: 200px;'>Лайки</h1>
 		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ users_liked.count }}</h1>
 	</div>
 	<br>
@@ -38,8 +38,13 @@
 				</div>
 	        </div>
 	        <div class="sub_info">
-	        	{% if user_liked.profile.city %}
+	        	{% if user_liked.profile.bio %}
+		    	<p class="sub_bio">{{ user_liked.profile.bio|truncatechars:60 }}</p>
+		    	{% endif %}
+	        	{% if user_liked.profile.city and user_liked.profile.bio %}
 		    	<p class="sub_city"><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ user_liked.profile.city }}</p>
+		    	{% elif user_liked.profile.city %}
+		    	<p class="sub_city" style='margin: 0 0 0 -6px; padding-top: 5px;'><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ user_liked.profile.city }}</p>
 		    	{% endif %}
 		    </div>
 		</div>

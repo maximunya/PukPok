@@ -17,10 +17,11 @@
 	height: auto;
 	background-image: url('/static/PukPok/img/фон-логин.png');
 	background-attachment: fixed;
-  	background-position: center center;
-  	background-size: cover;
-  	background-color: #222;
-  	background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-color: #222;
+  background-repeat: no-repeat;
+  padding: 2% 0 3% 10%;
 }
 
 .reg {
@@ -141,10 +142,10 @@
 }
 
 .posts {
-	width: 85%;
+	width: 1010px;
 	font-family: sans-serif;
 	padding-bottom: 10%;
-	padding-left: 1%;
+	padding-left: 2%;
 }
 
 
@@ -162,9 +163,17 @@
 }
 
 .pub_date {
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: bold;
 	text-align: right;
+	margin-right: 15px;
+}
+
+.pub_date_details {
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+	margin-right: 50px;
 }
 
 .comment_pub_date {
@@ -179,7 +188,7 @@
 .comment_text {
 	margin-bottom: -10px;
 	padding-bottom: -10px;
-	margin-top: 10px;
+	margin-top: 7px;
 }
 
 .whole_comments {
@@ -202,7 +211,7 @@
 
 .comment {
 	margin-left: 15px;
-	width: 718px;
+	width: 680px;
 }
 
 
@@ -310,7 +319,7 @@
 .comment_info {
 	display: flex;
 	justify-content: space-between;
-	width: 50vw;
+	width: 680px;
 	padding-top: 0px;
 	margin-top: -10px;
 	margin-bottom: -20px;
@@ -427,8 +436,8 @@ background-color:transparent;
 
 footer{
     width: 100%;/*на всю ширину*/
-    padding: 20px 50px;/*поля для контента*/
-    background: black;/*цвет футера*/
+    padding: 20px 130px 20px 0;/*поля для контента*/
+    background: #111;/*цвет футера*/
     display: flex;
     justify-content: center;/*в центре по горизонтали*/
     align-items: center;/*в центре по вертикали*/
@@ -458,7 +467,7 @@ footer{
     transition: 0.5s;/*плавный переход*/
 }
 .menu li a {
-    font-size: 1.2em;/*размер ссылок меню*/
+    font-size: 1em;/*размер ссылок меню*/
     color: #fff;/*цвет ссылок меню*/
     opacity: 0.75;/*значение прозрачности*/
     margin: 0 15px;
@@ -472,7 +481,7 @@ footer p {
     color: #fff;
     text-align: center;
     margin-top: 15px;
-    font-size: 1.1em;
+    font-size: 0.8em;
 }    
 
 .profile_page_main {
@@ -701,8 +710,8 @@ footer p {
 }
 
 .user_header {
-	margin: 5% 0 4% 7%;
-	width: 81%;
+	margin: 60px 0 20px 160px;
+	width: 900px;
 	border-radius: 0%;
 	padding-top: 5%;
 }
@@ -739,25 +748,22 @@ footer p {
 }
 
 .post_form {
-	width: 70%
+	width: 850
 	background: white;
-	color: black;
-	margin: 0 15% 2% 15%;
+	margin: -20px 0px 10px 160px;
 	
 }
 
 .post_input {
-  opacity: 0.8;
   color: white;
   font-size: 2.2vh;
-  margin: 0 auto 2vh auto;
-  height: 15vh;
-  border: 0.07vh solid #ddd;
+  margin: 0 0 2vh 0;
+  height: 70px;
+  border: 0.07vh solid #black;
   border-radius: 20px 20px;
   width: 100%;
   padding: 1vh 1.2vw;
-  
-  background: #111;
+  background: #222;
 }
 
 .form {
@@ -774,7 +780,7 @@ footer p {
 }
 
 .post_detail {
-	width: 81%;
+	width: 1010px;
 	height: ;
 	margin: 4% 0 0 3%;
 	padding-bottom: 2%;
@@ -849,11 +855,11 @@ footer p {
   opacity: 0.9;
   color: black;
   font-size: 1.9vh;
-  margin: 0 0 2vh 2.5%;
-  height: 10vh;
+  margin: 0 0 15px 15px;
+  height: 85px;
   border: 0.07vh solid #ddd;
   border-radius: 10px 10px;
-  width: 117%;
+  width: 680px;
   padding: 1vh 1.2vw;
   background: white;
 }
@@ -1201,10 +1207,10 @@ ul.errorlist {
 
 .sub_card {
 	background: #333;
-	width: 55%;
+	width: 600px;
 	height: 110px;
 	border-radius: 20px 20px;
-	margin: 0 0 0 1%;
+	margin: 0 0 0 200px;
 	border: 1px solid #555;
 }
 
@@ -1243,18 +1249,25 @@ ul.errorlist {
 }
 
 .sub_info {
-	margin: 10px 0 0 120px;
+	margin: 5px 0 0 120px;
 }
 
 .sub_city {
-	font-size: 12px;
+	font-size: 11px;
+	color: #ccc;
+	margin: -10px 0 0 -6px; 
+	font-weight: bold;
+}
+
+.sub_bio {
+	font-size: 13px;
 	color: #ccc; 
 }
 
 .online {
 	font-size: 10px;
 	color: #aaa;
-	margin-top: ; 
+	padding-top: 2px; 
 }
 
 .location {
@@ -1345,10 +1358,10 @@ ul.errorlist {
 
 .note_card {
 	background: #333;
-	width: 60%;
+	width: 700px;
 	height: 120px;
 	border-radius: 20px 20px;
-	margin: 0 0 0 13%;
+	margin: 0 0 0 160px;
 	border: 1px solid #555;
 	position: relative;
 }
@@ -1458,5 +1471,17 @@ ul.errorlist {
 .new_notes {
 	position: absolute;
 	left: 29%;
+	font-size: 18px;
+}
+
+.form_profile_picture {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	margin: 5px 10px;
+}
+
+.no_notifications {
+	margin-left: 160px;
 	font-size: 18px;
 }

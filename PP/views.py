@@ -22,8 +22,6 @@ from django.forms import modelformset_factory
 from django.utils import timezone as tz
 
 
-
-
 class LoggedAndPassedTestUserMixin(LoginRequiredMixin, UserPassesTestMixin):
 
 	def test_func(self):
@@ -55,41 +53,6 @@ class LoggedAndPassedTestPostMixin(LoginRequiredMixin, UserPassesTestMixin):
 		return redirect('index')
 
 
-#class UpdateUserProfileAPI(viewsets.GenericViewSet):
-
-	#renderer_classes = [TemplateHTMLRenderer,]
-	#template_name = 'PP/update_user_info.html'
-	#permission_classes = [permissions.IsAuthenticatedOrReadOnly,]
-
-	#def get_queryset(self):
-	#	queryset = Profile.objects.all()
-	#	return queryset
-
-	#def get_serializer_class(self):
-	#	return UserProfileSerializer
-
-	#@action(methods=["GET",], detail=False)
-	#def get(self, request):
-	#	return Response({'serializer': self.get_serializer_class(),},)
-
-	#@action(methods=["POST",], detail=False)
-	#def post(self, request):
-	#	user = request.user
-	#	data = request.data
-	#	update_user_profile(user=user, data=data)
-	#	return Response({'serializer': self.get_serializer_class(),},)
-
-	#@action(methods=["PUT",], detail=False)
-	#def edit_profile(self, request, *args, **kwargs):
-	#	user = request.user
-	#	data = request.data
-	#	update_user_profile(user=user, data=data)
-	#	return Response({'serializer': self.get_serializer_class(),},)
-
-	#def get_success_url(self, **kwargs):
-		#return reverse_lazy('profile_page', kwargs={'pk': self.request.user.id})
-
-	
 def index(request):
 	if request.user.is_authenticated:
 		user = User.objects.select_related('profile').get(pk=request.user.id)
@@ -223,7 +186,7 @@ def like_comment(request, pk):
 
 
 class ProfilePage(DetailView):
-	model = Profile 
+	model = Profile
 	template_name = 'PP/profile_page.html'
 	first_form = PostForm()
 	second_form = PostImagesForm()
@@ -292,29 +255,6 @@ class ProfilePage(DetailView):
 		context['subscribers_amount'] = subscribers_amount
 		context['subs_amount'] = subs_amount
 		return context
-	
-
-#def create_post(request):
-#	if request.method == 'POST':
-#		post_form = PostForm(data=request.POST)
-#		post_images_form = PostImagesForm(data=request.POST, files=request.FILES)
-#		if post_form.is_valid() and post_images_form.is_valid():
-#			post = post_form.save(commit=False)
-#			post.author = request.user
-#			post.save()
-#			post_image = post_images_form.save(commit=False)
-#			post_image.post = post
-#			post_image.save()
-#			return redirect('index')
-#	else:
-#		post_form = PostForm()
-#		post_images_form = PostImagesForm()	
-#	
-#	return render(
-#		request,
-#		'PP/test_func.html',
-#		{'post_form': post_form, 'post_images_form': post_images_form}
-#	)
 
 
 def subscribes(request, pk):
@@ -483,7 +423,7 @@ class UpdateCommentView(UpdateView):
 	model = Comment
 	form_class = CommentForm
 	template_name = "PP/update_comment.html"
-	
+
 	def get_context_data(self, *args, **kwargs):
 		context = super(UpdateCommentView, self).get_context_data(*args, **kwargs)
 		if self.request.user.is_authenticated:
@@ -518,14 +458,14 @@ def delete_comment(request, comment_id, post_id):
 		hour=comment.comment_posted_at.hour,
 		minute=comment.comment_posted_at.minute,
 		second=comment.comment_posted_at.second,
-		)
+	)
 	post = Post.objects.get(pk=post_id)
 	notifications = Notification.objects.filter(
 		notification_type='comment',
 		post_id=comment.post.id,
 		text=comment.comment_text,
 		sender=comment.author
-		)
+	)
 	note_timestamp = None
 
 	if request.user == post.author:
@@ -538,7 +478,7 @@ def delete_comment(request, comment_id, post_id):
 				hour=note.timestamp.hour,
 				minute=note.timestamp.minute,
 				second=note.timestamp.second,
-				)
+			)
 			if note_timestamp == comment_timestamp:
 				note.delete()
 		messages.success(request, 'Комментарий удалён.')
@@ -553,7 +493,7 @@ def delete_comment(request, comment_id, post_id):
 				hour=note.timestamp.hour,
 				minute=note.timestamp.minute,
 				second=note.timestamp.second,
-				)
+			)
 			if note_timestamp == comment_timestamp:
 				note.delete()
 		messages.success(request, 'Комментарий удалён.')
@@ -578,14 +518,14 @@ def delete_comment_profile(request, comment_id, post_id):
 		hour=comment.comment_posted_at.hour,
 		minute=comment.comment_posted_at.minute,
 		second=comment.comment_posted_at.second,
-		)
+	)
 	post = Post.objects.get(pk=post_id)
 	notifications = Notification.objects.filter(
 		notification_type='comment',
 		post_id=comment.post.id,
 		text=comment.comment_text,
 		sender=comment.author
-		)
+	)
 	note_timestamp = None
 
 	if request.user == post.author:
@@ -598,7 +538,7 @@ def delete_comment_profile(request, comment_id, post_id):
 				hour=note.timestamp.hour,
 				minute=note.timestamp.minute,
 				second=note.timestamp.second,
-				)
+			)
 			if note_timestamp == comment_timestamp:
 				note.delete()
 		messages.success(request, 'Комментарий удалён.')
@@ -613,7 +553,7 @@ def delete_comment_profile(request, comment_id, post_id):
 				hour=note.timestamp.hour,
 				minute=note.timestamp.minute,
 				second=note.timestamp.second,
-				)
+			)
 			if note_timestamp == comment_timestamp:
 				note.delete()
 		messages.success(request, 'Комментарий удалён.')
@@ -666,28 +606,23 @@ def notifications(request):
 		user.save()
 
 	notifications = Notification.objects.filter(receiver_id=request.user)
-	#notes = []
 	for n in notifications:
-		if (tz.now() - timedelta(days=15) > n.timestamp) and n.is_read:
+		if (tz.now() - timedelta(days=100) > n.timestamp) and n.is_read:
 			n.delete()
-		#else:
-		#	notes.append(n)
 
 	notes = Notification.objects.filter(receiver_id=request.user)
-	new_notes = notes.filter(is_read=False)
-	read_notes = notes.filter(is_read=True)
+	unread_notes = notes.filter(is_read=False)
 
-	context = {
-		#'notes': notes,
-		'new_notes': new_notes,
-		'read_notes': read_notes,
-	}
-
-	for note in new_notes:
+	for note in unread_notes:
 		note.is_read = True
 		note.save()
-	return render(request, 'PP/notifications.html', context)
 
+	context = {
+		'unread_notes': unread_notes,
+		'notes': notes,
+	}
+
+	return render(request, 'PP/notifications.html', context)
 
 
 @login_required
@@ -705,9 +640,3 @@ def delete_notification(request, pk):
 	else:
 		messages.error(request, 'Вы не можете удалить этот объект.')
 		return redirect('index')
-	
-
-
-
-
-

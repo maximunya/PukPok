@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<main class="profile_page_main">
+<main class="main_container" style="padding: 5% 0 30% 0%;">
 	{% if user.is_authenticated %}
 	{% if comment.author.id == user.id %}
 	{% if comment.can_edit %}
@@ -237,10 +237,10 @@
 	          {% endif %}
 	        </div>
 	        <div class="comment_form">	 
-				<form method="post" class="comment_form1" style="width: 178%; margin-bottom: -10px;">
+				<form method="post" class="comment_form1" style="width: 100%; margin-bottom: -10px;">
 					{% csrf_token %}
 					{{ form.as_p }}
-					<button action="{% url 'post_detail' comment.post.pk %}" class="btn btn-dark btn-sm" style="width: 117%; margin-left: 2.5%; margin-top: -50px; padding-bottom: -20px;">Сохранить</button>
+					<button action="{% url 'post_detail' comment.post.pk %}" class="btn btn-dark btn-sm" style="width: 680px; margin-left: 15px; margin-top: -50px; padding-bottom: -20px;">Сохранить</button>
 				</form>
 			</div>
 		</div>

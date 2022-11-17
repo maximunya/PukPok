@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<main class="main_container" style="padding: 5% 0 50% 0">
+<main class="main_container" style="padding: 5% 0 30% 0">
 	{% if messages %}
       <div style="margin: 0 0 -20px 0; padding: 5% 0 0 0;" class="flex">
         <div style="margin: 0 0 0 7.8%; padding: 0;" class='last_posts1'>
@@ -82,31 +82,31 @@
 	        </div>
 	        {% if post.posted_at|date:"d M H:i:s" == post.edited_at|date:"d M H:i:s" %}
 	            {% if post.mytime1 == 1 %}
-	            <p class="pub_date">сегодня в {{ post.posted_at|date:"H:i" }}</p>
+	            <p class="pub_date_details">сегодня в {{ post.posted_at|date:"H:i" }}</p>
 	            {% elif post.mytime1 == 2 %}
-	            <p class="pub_date">вчера в {{ post.posted_at|date:"H:i" }}</p>
+	            <p class="pub_date_details">вчера в {{ post.posted_at|date:"H:i" }}</p>
 	            {% elif post.mytime1 == 3 %}
-	            <p class="pub_date">позавчера в {{ post.posted_at|date:"H:i" }}</p>
+	            <p class="pub_date_details">позавчера в {{ post.posted_at|date:"H:i" }}</p>
 	            {% elif post.mytime1 == 4 %}
-	            <p class="pub_date">{{ post.posted_at|date:"j E в H:i" }}</p>
+	            <p class="pub_date_details">{{ post.posted_at|date:"j E в H:i" }}</p>
 	            {% elif post.mytime1 == 5 %}
-	            <p class="pub_date">{{ post.posted_at|date:"j E y" }}</p>
+	            <p class="pub_date_details">{{ post.posted_at|date:"j E y" }}</p>
 	            {% else %}
-	            <p class="pub_date">{{ post.mytime1 }}</p>
+	            <p class="pub_date_details">{{ post.mytime1 }}</p>
 	            {% endif %}
 	        {% else %}
 	            {% if post.mytime1 == 1 %}
-	            <p class="pub_date">сегодня в {{ post.posted_at|date:"H:i" }} (ред.)</p>
+	            <p class="pub_date_details">сегодня в {{ post.posted_at|date:"H:i" }} (ред.)</p>
 	            {% elif post.mytime1 == 2 %}
-	            <p class="pub_date">вчера в {{ post.posted_at|date:"H:i" }} (ред.)</p>
+	            <p class="pub_date_details">вчера в {{ post.posted_at|date:"H:i" }} (ред.)</p>
 	            {% elif post.mytime1 == 3 %}
-	            <p class="pub_date">позавчера в {{ post.posted_at|date:"H:i" }} (ред.)</p>
+	            <p class="pub_date_details">позавчера в {{ post.posted_at|date:"H:i" }} (ред.)</p>
 	            {% elif post.mytime1 == 4 %}
-	            <p class="pub_date">{{ post.posted_at|date:"j E в H:i" }} (ред.)</p>
+	            <p class="pub_date_details">{{ post.posted_at|date:"j E в H:i" }} (ред.)</p>
 	            {% elif post.mytime1 == 5 %}
-	            <p class="pub_date">{{ post.posted_at|date:"j E Y" }} (ред.)</p>
+	            <p class="pub_date_details">{{ post.posted_at|date:"j E Y" }} (ред.)</p>
 	            {% else %}
-	            <p class="pub_date">{{ post.mytime1 }} (ред.)</p>
+	            <p class="pub_date_details">{{ post.mytime1 }} (ред.)</p>
 	            {% endif %}
 	        {% endif %}
 	      </div>
@@ -212,7 +212,7 @@
 			  <form class="comment_form1" action="{% url 'create_comment' %}" method="post">
 			    {% csrf_token %}
 			    {{ create_comment_form }}
-			    <button type="submit" class="btn btn-dark" style="width: 117%; margin-left: 2.5%; margin-top: -15px;">Отправить</button>
+			    <button type="submit" class="btn btn-dark" style="width: 680px; margin-left: 15px; margin-top: -10px; margin-bottom: 10px;">Отправить</button>
 			  </form>
 			</div>
 		      <script>

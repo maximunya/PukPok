@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block content %}
-<main class="profile_page_main">
-	<div class="edit_profile_container">
+<main class="main_container">
+	<div class="edit_profile_container" style="padding: 10% 0 25% 10%;">
 		{% if user.is_authenticated %}
 		{% if request.user.id == user.pk %}
 		<h1 class="title">Настройки аккаунта</h1>

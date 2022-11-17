@@ -6,10 +6,11 @@
 {% endblock %}
 
 {% block content %}
-<main class="main_container" style="padding: 9% 0 100% 7%; color: white;">
+<main class="main_container" style="padding: 9% 0 50% 7%; color: white;">
 	<div class="subs_title">
-		<h1 class="title">Подписчики</h1>
+		<h1 class="title" style='margin-left: 200px;'>Подписчики</h1>
 		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ subscribers.count }}</h1>
+		<a href="{% url 'subscribes_list' user.profile.id %}" class="btn btn-primary btn-sm" style="height: 32px; margin-left: 30px; margin-top: 9px;">Подписки</a>
 	</div>
 	<br>
 	{% for sub in subscribers %}
@@ -38,8 +39,13 @@
 				</div>
 	        </div>
 	        <div class="sub_info">
-	        	{% if sub.profile.city %}
+	        	{% if sub.profile.bio %}
+		    	<p class="sub_bio">{{ sub.profile.bio|truncatechars:60 }}</p>
+		    	{% endif %}
+	        	{% if sub.profile.city and sub.profile.bio %}
 		    	<p class="sub_city"><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ sub.profile.city }}</p>
+		    	{% elif sub.profile.city %}
+		    	<p class="sub_city" style='margin: 0 0 0 -6px; padding-top: 5px;'><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ sub.profile.city }}</p>
 		    	{% endif %}
 		    </div>
 		</div>
