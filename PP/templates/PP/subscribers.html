@@ -10,7 +10,10 @@
 	<div class="subs_title">
 		<h1 class="title" style='margin-left: 200px;'>Подписчики</h1>
 		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ subscribers.count }}</h1>
-		<a href="{% url 'subscribes_list' user.profile.id %}" class="btn btn-primary btn-sm" style="height: 32px; margin-left: 30px; margin-top: 9px;">Подписки</a>
+		<a href="{% url 'subscribes_list' profile.id %}" class="btn btn-light btn-sm" style="height: 32px; margin-left: 30px; margin-top: 9px;">Подписки</a>
+		{% if profile.user == user %}
+		<a href="{% url 'black_list' %}" class="btn btn-outline-danger btn-sm" style="height: 28px; margin-left: 120px; margin-top: 13px; font-size: 12px;">Чёрный список</a>
+		{% endif %}
 	</div>
 	<br>
 	{% for sub in subscribers %}
@@ -19,25 +22,33 @@
 				<div class="pic_username_flex">
 					<a href="{% url 'profile_page' sub.profile.id %}"><img class="profile_pic" style="margin: 10px 15px" src="{{ sub.profile.profile_pic.url }}" alt=""></a>
 					<h5 class="sub_username">
-						<a class="sub_username_link" href="{% url 'profile_page' sub.profile.id %}">{{ sub.username }}</a>
-						<p class="online">
-							{% if sub.profile.is_online == 1 %}
-					        {{ sub.profile.define_sex }} сегодня в {{ sub.profile.last_active|date:"H:i" }}
-					        {% elif sub.profile.is_online == 2 %}
-					        {{ sub.profile.define_sex }} вчера в {{ sub.profile.last_active|date:"H:i" }}
-					        {% elif sub.profile.is_online == 3 %}
-					        {{ sub.profile.define_sex }} позавчера в {{ sub.profile.last_active|date:"H:i" }}
-					        {% elif sub.profile.is_online == 4 %}
-					        {{ sub.profile.define_sex }} {{ sub.profile.last_active|date:"j E в H:i" }}
-					        {% elif sub.profile.is_online == 5 %}
-					        {{ sub.profile.define_sex }} {{ sub.profile.last_active|date:"j E y" }}
-					        {% else %}
-					        {{ sub.profile.is_online }}
-					        {% endif %}
-						</p>
+						<div>
+							<a class="sub_username_link" href="{% url 'profile_page' sub.profile.id %}">{{ sub.username }}</a>
+						</div>
+						{% if profile.user == user %}
+						<div>
+							<a href="{% url 'delete_sub' sub.pk %}" class="btn btn-outline-light btn-sm" style="width: 67px; height: 25px; font-size: 11px; padding: auto;">Отписать</a>
+							<a href="{% url 'block_user' sub.pk %}" class="btn btn-danger btn-sm" style="width: 95px; height: 25px; font-size: 11px; padding: auto;">Заблокировать</a>
+						</div>
+						{% endif %}
 					</h5>
 				</div>
 	        </div>
+	        <p class="online">
+				{% if sub.profile.is_online == 1 %}
+		        {{ sub.profile.define_sex }} сегодня в {{ sub.profile.last_active|date:"H:i" }}
+		        {% elif sub.profile.is_online == 2 %}
+		        {{ sub.profile.define_sex }} вчера в {{ sub.profile.last_active|date:"H:i" }}
+		        {% elif sub.profile.is_online == 3 %}
+		        {{ sub.profile.define_sex }} позавчера в {{ sub.profile.last_active|date:"H:i" }}
+		        {% elif sub.profile.is_online == 4 %}
+		        {{ sub.profile.define_sex }} {{ sub.profile.last_active|date:"j E в H:i" }}
+		        {% elif sub.profile.is_online == 5 %}
+		        {{ sub.profile.define_sex }} {{ sub.profile.last_active|date:"j E y" }}
+		        {% else %}
+		        {{ sub.profile.is_online }}
+		        {% endif %}
+			</p>
 	        <div class="sub_info">
 	        	{% if sub.profile.bio %}
 		    	<p class="sub_bio">{{ sub.profile.bio|truncatechars:60 }}</p>

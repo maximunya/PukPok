@@ -31,6 +31,7 @@
               {% if comment.post.can_edit %}
               <a href="{% url 'update_post' comment.post.pk %}" class="post_author1"><p class="post_update">✎</p></a>
               {% endif %}
+              <a href="{% url 'post_to_archive' post.pk %}" class="post_author1"><p style="margin-top: 0px;" class="post_update">✉</p></a>
               <a href="{% url 'delete_post' comment.post.pk %}" class="post_author1"><p class="post_delete">✕</p></a>
             </div>
             {% endif %}

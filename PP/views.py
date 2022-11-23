@@ -20,6 +20,7 @@ from rest_framework import permissions
 from datetime import datetime, timedelta
 from django.forms import modelformset_factory
 from django.utils import timezone as tz
+from django.db.models import Count
 
 
 class LoggedAndPassedTestUserMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -53,6 +54,20 @@ class LoggedAndPassedTestPostMixin(LoginRequiredMixin, UserPassesTestMixin):
 		return redirect('index')
 
 
+class PassedTestArchivedPostMixin(UserPassesTestMixin):
+
+	def test_func(self):
+		post = Post.objects.get(id=self.kwargs['pk'])
+		if self.request.user == post.author:
+			return True
+		else:
+			return post.is_published
+
+	def handle_no_permission(self):
+		messages.error(self.request, 'Ошибка доступа')
+		return redirect('index')
+
+
 def index(request):
 	if request.user.is_authenticated:
 		user = User.objects.select_related('profile').get(pk=request.user.id)
@@ -73,7 +88,7 @@ def test(request):
 	return render(request, 'PP/test.html', context)
 
 
-class PostDetailView(DetailView):
+class PostDetailView(PassedTestArchivedPostMixin, DetailView):
 	model = Post
 	template_name = 'PP/post_detail.html'
 
@@ -224,6 +239,9 @@ class ProfilePage(DetailView):
 		posts_amount = posts.count()
 		subscribers_amount = profile.subscribers.count()
 		subs_amount = Profile.objects.select_related('user').filter(subscribers=user_id).count()
+		if self.request.user.is_authenticated:
+			request_user_subs = user.profile.subscribers.all()
+			request_user_black_list = user.profile.black_list.all()
 
 		if posts_amount <= 10:
 			if posts_amount == 1:
@@ -254,6 +272,9 @@ class ProfilePage(DetailView):
 		context['total_posts'] = total_posts
 		context['subscribers_amount'] = subscribers_amount
 		context['subs_amount'] = subs_amount
+		if self.request.user.is_authenticated:
+			context['request_user_subs'] = request_user_subs
+			context['request_user_black_list'] = request_user_black_list
 		return context
 
 
@@ -582,18 +603,18 @@ def subscribe(request, pk):
 		user.save()
 	profile = get_object_or_404(Profile, id=request.POST.get('profile_id'))
 	if request.user.id != pk:
-		subscribed = False
 		if profile.subscribers.filter(id=request.user.id).exists():
 			profile.subscribers.remove(request.user)
 			notification = Notification.objects.filter(notification_type='subscribe', comment_id=None, post_id=None, receiver=profile.user, sender=user, text=None)
 			notification.delete()
-			subscribed = False
 		else:
-			profile.subscribers.add(request.user)
-			receiver = profile.user
-			if receiver != user:
-				Notification.objects.create(receiver=receiver, sender=user, notification_type='subscribe')
-			subscribed = True
+			if not user.profile.black_list.filter(id=profile.user.id).exists():
+				profile.subscribers.add(request.user)
+				receiver = profile.user
+				if receiver != user:
+					Notification.objects.create(receiver=receiver, sender=user, notification_type='subscribe')
+			else:
+				messages.error(request, 'Вы не можете подписаться на этого пользователя.')
 
 	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
 
@@ -635,8 +656,134 @@ def delete_notification(request, pk):
 	notification = Notification.objects.get(id=pk)
 	if user == notification.receiver:
 		notification.delete()
-		#messages.success(request, 'Уведомление скрыто.')
+		messages.success(request, 'Уведомление скрыто.')
 		return redirect('notifications')
 	else:
 		messages.error(request, 'Вы не можете удалить этот объект.')
+		return redirect('index')
+
+
+@login_required
+def delete_from_subscribers(request, pk):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	profile = user.profile
+	if profile.subscribers.filter(id=pk).exists():
+		profile.subscribers.remove(pk)
+		messages.success(request, 'Пользователь отписан.')
+		return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+	else:
+		messages.error(request, 'Этот пользователь не является Вашим подписчиком.')
+		return redirect('index')
+
+
+@login_required
+def add_user_to_black_list(request, pk):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	profile = user.profile
+	blocking_user = User.objects.get(id=pk)
+	blocking_profile = blocking_user.profile
+
+	if profile.black_list.filter(id=pk).exists():
+		profile.black_list.remove(pk)
+		messages.success(request, 'Пользователь разблокирован.')
+	else:
+		if profile.subscribers.filter(id=pk).exists():
+			profile.subscribers.remove(pk)
+		if blocking_profile.subscribers.filter(id=user.id).exists():
+			blocking_profile.subscribers.remove(user)
+			notification = Notification.objects.filter(notification_type='subscribe', comment_id=None, post_id=None, receiver=blocking_user, sender=user, text=None)
+			notification.delete()
+		profile.black_list.add(pk)
+		messages.success(request, 'Пользователь добавлен в черный список.')
+	return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+
+@login_required
+def black_list(request):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	profile = user.profile
+	black_list = profile.black_list.select_related('profile').all()
+
+	context = {
+		'profile': profile,
+		'black_list': black_list,
+	}
+
+	return render(request, 'PP/black_list.html', context)
+
+
+def users_list(request):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	all_users = Profile.objects.select_related('user').annotate(subs_count=Count('subscribers'), posts_count=Count('user__posts')).order_by('-subs_count', '-posts_count')
+	context = {
+		'all_users': all_users,
+	}
+
+	return render(request, 'PP/users_list.html', context)
+
+
+@login_required
+def delete_all_notifications(request):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	all_notifications = Notification.objects.filter(receiver=user)
+	all_notifications.delete()
+	messages.success(request, 'Все уведомления скрыты.')
+	return redirect('notifications')
+
+
+@login_required
+def archived_posts_list(request):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	archived_posts = Post.objects.prefetch_related('comments__author__profile').select_related('author__profile').prefetch_related("likes").prefetch_related('comments__likes').prefetch_related('post_images').filter(is_published=False, author=user)
+	context = {
+		'archived_posts': archived_posts,
+	}
+	return render(request, "PP/archived_posts_list.html", context)
+
+
+@login_required
+def post_to_archive(request, pk):
+	if request.user.is_authenticated:
+		user = User.objects.get(pk=request.user.id)
+		user.profile.last_active = datetime.now()
+		user.save()
+
+	post = Post.objects.get(id=pk)
+	if post.author == user:
+		if post.is_published:
+			post.is_published = False
+			post.save()
+			messages.success(request, 'Пост архивирован.')
+			return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+		else:
+			post.is_published = True
+			post.save()
+			messages.success(request, 'Пост восстановлен.')
+			return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+	else:
+		messages.error(request, 'Вы не можете архивировать чужой пост.')
 		return redirect('index')

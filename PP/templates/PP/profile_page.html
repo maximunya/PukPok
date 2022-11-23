@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<main class="main_container" style="padding: 1% 0 0 0%;">
+<main class="main_container" style="padding: 0% 0 0 0%;">
   {% if messages %}
     <div style="margin-bottom: -100px; padding-top: 6%; margin-left: 73%; width: 12.5%; text-align: center; font-size: 12px;" class="profile_message">
     {% for message in messages %}
@@ -67,14 +67,31 @@
           {% endif %}
           {% if user.is_authenticated %}
             {% if user.profile.id != page_user.id %}
-            <form action="{% url 'subscribe_profile' page_user.pk %}" method="POST" class="subscribe_form">
-              {% csrf_token %}
-              {% if user in page_user.subscribers.all %}
-              <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-outline-light btn-sm" style="margin: auto; display: block; width: 150px;">Вы подписаны</button>
-              {% else %}
-              <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-primary btn-sm" style="margin: auto; display: block; width: 150px;">Подписаться</button>
-              {% endif %}
-            </form>
+            <div class="only_flex">
+              <div>
+                <form action="{% url 'subscribe_profile' page_user.pk %}" method="POST" class="subscribe_form">
+                  {% csrf_token %}
+                  {% if user in page_user.subscribers.all %}
+                  <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-outline-light btn-sm" style="margin: auto; display: block; width: 150px;">Вы подписаны</button>
+                  {% else %}
+                  <button type="submit" name="profile_id" value="{{ page_user.id }}" class="btn btn-primary btn-sm" style="margin: auto; display: block; width: 150px;">Подписаться</button>
+                  {% endif %}
+                </form>
+              </div>
+              <div>
+                <button type="button" class="btn btn-light btn-sm dropdown-toggle" style="margin: 15px 0 0 5px; width: 32px; padding: 4px 0 1px 0; font-size: 16px;" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                  {% if page_user.user in request_user_black_list %}
+                  <li><a class="dropdown-item " href="{% url 'block_user' page_user.user.pk %}">Разблокировать</a></li>
+                  {% else %}
+                  <li><a class="dropdown-item " href="{% url 'block_user' page_user.user.pk %}">Заблокировать</a></li>
+                  {% endif %}
+                  {% if page_user.user in request_user_subs %}
+                  <li><a class="dropdown-item" href="{% url 'delete_sub' page_user.user.pk %}">Отписать</a></li>
+                  {% endif %}
+                </ul>
+              </div>
+            </div>
             {% else %}
             <a style="margin: 10px auto; display: block; width: 200px;" href="{% url 'edit_profile_pic' request.user.profile.id %}" class="btn btn-secondary btn-sm">Изменить картинку</a>
             {% endif %}
@@ -114,11 +131,11 @@
             {% endif %}
             {% else %}
             <h7 class="card-title">Информация отсутствует.</h7>
+            <br>
             {% endif %}
             {% if user.is_authenticated %}
               {% if user.profile.id == page_user.id %}
-              <br>
-              <a style="font-size: 12px;" class="btn btn-primary btn-sm mr-1" href="{% url 'edit_profile' request.user.profile.id %}">Редактировать</a>
+              <a style="font-size: 12px; margin-top: 10px;" class="btn btn-primary btn-sm mr-1" href="{% url 'edit_profile' request.user.profile.id %}">Редактировать</a>
               {% endif %}
             {% endif %}
           </div>
@@ -137,22 +154,14 @@
             {{ post_images_form }}
             <button type="submit" class="btn btn-dark btn-sm" style="margin-top: -30px; width: 15%; text-align: center; margin-left: 84%; margin-bottom: 5%;" >Запостить</button>
           </form>
-
-          <script>
-            
-
-            var textarea = document.getElementById("text_input");
-            var heightLimit = 1500; /* Maximum height: 200px */
-            textarea.oninput = function() {
-              textarea.style.height = ""; /* Reset the height*/
-              textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
-            };
-          </script>
-
         </div>
       {% endif %}
     {% endif %}
-
+    {% if user.is_authenticated %}
+    {% if user.profile.id == page_user.id %}
+    <a href="{% url 'archived_posts' %}" class="btn btn-secondary btn-sm mb-4" style="margin: -20px 0 0 240px;">Архив постов</a>
+    {% endif %}
+    {% endif %}
     <div style="padding-bottom: 1%; margin-bottom: 0;" class="posts">
           {% for post in posts %}
           <div class="post" style="width: 103%;">
@@ -173,8 +182,9 @@
                   {% if post.author.id == user.id %}
                   <div class="flex1">
                     {% if post.can_edit %}
-                    <a href="{% url 'update_post' post.pk %}" class="post_author1"><p class="post_update">✎</p></a>
+                    <a href="{% url 'update_post' post.pk %}" class="post_author1"><p style="margin-top: 0px;" class="post_update">✎</p></a>
                     {% endif %}
+                    <a href="{% url 'post_to_archive' post.pk %}" class="post_author1"><p style="margin-top: 0px;" class="post_update">✉</p></a>
                     <a href="{% url 'delete_post_profile' post.pk %}" class="post_author1"><p class="post_delete">✕</p></a>
                   </div>
                   {% endif %}
@@ -335,5 +345,14 @@
       </div>
 
 </main>
+
+<script>
+  var textarea = document.getElementById("text_input");
+  var heightLimit = 1500; /* Maximum height: 200px */
+  textarea.oninput = function() {
+    textarea.style.height = ""; /* Reset the height*/
+    textarea.style.height = Math.min(textarea.scrollHeight, heightLimit) + "px";
+  };
+</script>
 
 {% endblock %}

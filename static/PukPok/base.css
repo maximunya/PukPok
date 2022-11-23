@@ -1202,13 +1202,13 @@ ul.errorlist {
 }
 
 .subscribe_form {
-	margin: 15px 0 0 0;
+	margin: 15px 0 0 6px;
 }
 
 .sub_card {
 	background: #333;
 	width: 600px;
-	height: 110px;
+	height: 115px;
 	border-radius: 20px 20px;
 	margin: 0 0 0 200px;
 	border: 1px solid #555;
@@ -1234,10 +1234,13 @@ ul.errorlist {
 	margin: 15px 0 0 0px;
 	font-size: 18px;
 	height: 20px;
+	display: flex;
+	width: 460px;
+	justify-content: space-between;
 }
 
 .unsub_form {
-	margin: 10px 0 0 0;
+	margin: -2px -12px 0 30px;
 }
 
 .sub_username_link {
@@ -1267,12 +1270,12 @@ ul.errorlist {
 .online {
 	font-size: 10px;
 	color: #aaa;
-	padding-top: 2px; 
+	margin: -13px 0 0 120px;
 }
 
 .location {
 	width: 17px;
-	margin: 0 3px 3px 0;
+	margin: -1px 3px 3px 2px;
 }
 
 .profile_subs_info {
@@ -1332,8 +1335,8 @@ ul.errorlist {
 }
 
 .img_post_image {
-	max-width: 500px;
-	max-height: 500px; 
+	max-width: 600px;
+	max-height: 600px; 
 }
 
 .notifications_icon {
@@ -1484,4 +1487,17 @@ ul.errorlist {
 .no_notifications {
 	margin-left: 160px;
 	font-size: 18px;
+}
+
+.only_flex {
+	display: flex;
+}
+
+.user_subs_info {
+	width: 110px;
+	margin-top: 18px;
+	margin-left: -230px;
+	font-size: 12px;
+	text-align: center;
+	display: flex;
 }

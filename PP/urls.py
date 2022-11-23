@@ -33,6 +33,11 @@ urlpatterns = [
 	path('comment/<int:pk>/likes', views.liked_comment, name='liked_comment_list'),
 	path('notifications', views.notifications, name='notifications'),
 	path('notifications/delete_notification/<int:pk>', views.delete_notification, name='delete_notification'),
-	#path('test_func', views.create_post, name='test_func'),
+	path('notifications/delete_all_notifications', views.delete_all_notifications, name='delete_all_notifications'),
+	path('block/<int:pk>', views.add_user_to_black_list, name='block_user'),
+	path('delete_sub/<int:pk>', views.delete_from_subscribers, name='delete_sub'),
+	path('black_list', views.black_list, name='black_list'),
+	path('users_list', views.users_list, name='users_list'),
+	path('archived_posts', views.archived_posts_list, name='archived_posts'),
+	path('post_to_archive/<int:pk>', views.post_to_archive, name='post_to_archive'),
 ]
-

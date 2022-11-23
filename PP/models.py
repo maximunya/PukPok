@@ -31,6 +31,7 @@ class Profile(models.Model):
 	link4 = models.CharField(max_length=255, null=True, blank=True,)
 	last_active = models.DateTimeField(auto_now=True)
 	subscribers = models.ManyToManyField(User, blank=True, related_name='subscribers')
+	black_list = models.ManyToManyField(User, blank=True, related_name='black_list')
 
 	def __str__(self):
 		return str(self.user)

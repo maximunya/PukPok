@@ -2,15 +2,15 @@
 {% load static %}
 
 {% block title %}
-Лента PukPok
+Архив
 {% endblock %}
 
 {% block content %} 
-    <div class="main_container" style="padding: 1% 0 0 2%;">
+    <div class="main_container" style="padding: 1% 0 50% 2%;">
       {% if messages %}
       <div class="flex">
         <div class='last_posts1'>
-          <h1>Последние посты</h1>
+          <h1>Архив</h1>
         </div>
         <div class="message">
         {% for message in messages %}
@@ -27,12 +27,14 @@
         </div>
       </div>
       {% else %}
-      <div class='last_posts'>
-        <h1>Последние посты</h1>
+      <div class='last_posts' style="display: flex;">
+        <h1>Архив</h1>
+        <h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ archived_posts.count }}</h1>
       </div>
       {% endif %}
       <div class="posts">
-        {% for post in posts %}
+        {% if archived_posts %}
+        {% for post in archived_posts %}
         <div class="post">
           <div class="whole_post">
             <div class="profile_pic">
@@ -200,15 +202,13 @@
               </div> 
               {% endfor %}
               {% endif %}
-              {% if user.is_authenticated %}
-              <a href="{% url 'post_detail' post.pk %}" class="btn btn-dark mt-1 mb-1 ">Комментировать</a>
-              {% else %}
-              <a href="{% url 'login' %}" class="btn btn-dark mt-1 mb-1">Комментировать</a>
-              {% endif %}
             </div>      
           </div>
         </div>
-        {% endfor %}  
+        {% endfor %}
+        {% else %}
+        <p style="color: white; margin: -10px 0 0 70px">Ваш архив пуст!</p>
+        {% endif %} 
       </div>
     </div>
 {% endblock %}

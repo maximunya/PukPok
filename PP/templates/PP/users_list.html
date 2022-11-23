@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load pukpok_extras %}
+
+{% block title %}
+Пользователи PukPok
+{% endblock %}
+
+{% block content %}
+<main class="main_container" style="padding: 9% 0 50% 7%; color: white;">
+	<div class="subs_title">
+		<h1 class="title" style='margin-left: 200px;'>Пользователи</h1>
+		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ all_users.count }}</h1>
+	</div>
+	<br>
+	{% for every_user in all_users %}
+		<div class="sub_card">
+			<div class="sub_card_header">
+				<div class="pic_username_flex">
+					<a href="{% url 'profile_page' every_user.id %}"><img class="profile_pic" style="margin: 10px 15px" src="{{ every_user.profile_pic.url }}" alt=""></a>
+					<h5 class="sub_username">
+						<a class="sub_username_link" href="{% url 'profile_page' every_user.id %}">{{ every_user.user.username }}</a>
+					</h5>
+					<div class="user_subs_info">
+						<div style="margin-right: 30px;">
+				    		<a class="sub_link" href="{% url 'subscribers_list' every_user.pk %}"><p class="number" style="margin-bottom: -3px; font-size: 14px;">{{ every_user.subscribers.count }}</p>
+				    		Подписчики</a>
+			    		</div>
+			    		<div>
+				    		<a class="sub_link" href="{% url 'profile_page' every_user.pk %}"><p class="number" style="margin-bottom: -3px; font-size: 14px;">{{ every_user.user.posts|filter_posts }}</p>
+				    		Посты</a>
+			    		</div>
+			    	</div>
+				</div>
+	        </div>
+	        <p class="online">
+				{% if every_user.is_online == 1 %}
+		        {{ every_user.define_sex }} сегодня в {{ every_user.last_active|date:"H:i" }}
+		        {% elif every_user.is_online == 2 %}
+		        {{ every_user.define_sex }} вчера в {{ every_user.last_active|date:"H:i" }}
+		        {% elif every_user.is_online == 3 %}
+		        {{ every_user.define_sex }} позавчера в {{ every_user.last_active|date:"H:i" }}
+		        {% elif every_user.is_online == 4 %}
+		        {{ every_user.define_sex }} {{ every_user.last_active|date:"j E в H:i" }}
+		        {% elif every_user.is_online == 5 %}
+		        {{ every_user.define_sex }} {{ every_user.last_active|date:"j E y" }}
+		        {% else %}
+		        {{ every_user.is_online }}
+		        {% endif %}
+			</p>
+	        <div class="sub_info">
+	        	{% if every_user.bio %}
+		    	<p class="sub_bio">{{ every_user.bio|truncatechars:30 }}</p>
+		    	{% endif %}
+	        	{% if every_user.city and every_user.bio %}
+		    	<p class="sub_city"><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ every_user.city }}</p>
+		    	{% elif every_user.city %}
+		    	<p class="sub_city" style='margin: 0 0 0 -6px; padding-top: 5px;'><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ every_user.city }}</p>
+		    	{% endif %}
+		    </div>
+		</div>
+		<br>
+	{% endfor %}
+</main>
+{% endblock %}

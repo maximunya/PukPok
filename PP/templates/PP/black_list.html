@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Черный список
+{% endblock %}
+
+{% block content %}
+<main class="main_container" style="padding: 9% 0 50% 7%; color: white;">
+	<div class="subs_title">
+		<h1 class="title" style='margin-left: 200px;'>Чёрный список</h1>
+		<h1 style="color: #999; font-size: 39px; margin: 2px 0 0 15px;">{{ black_list.count }}</h1>
+	</div>
+	<br>
+	{% if black_list %}
+	{% for blocked in black_list %}
+		<div class="sub_card">
+			<div class="sub_card_header">
+				<div class="pic_username_flex">
+					<a href="{% url 'profile_page' blocked.profile.id %}"><img class="profile_pic" style="margin: 10px 15px" src="{{ blocked.profile.profile_pic.url }}" alt=""></a>
+					<h5 class="sub_username">
+						<a class="sub_username_link" href="{% url 'profile_page' blocked.profile.id %}">{{ blocked.profile.user.username }}</a>
+						<a class="btn btn-outline-light btn-sm" href="{% url 'block_user' blocked.pk %}" style="font-size: 11px; height: 25px">Разблокировать</a>
+					</h5>
+				</div>
+	        </div>
+	        <p class="online">
+				{% if blocked.profile.is_online == 1 %}
+		        {{ blocked.profile.define_sex }} сегодня в {{ blocked.profile.last_active|date:"H:i" }}
+		        {% elif blocked.profile.is_online == 2 %}
+		        {{ blocked.profile.define_sex }} вчера в {{ blocked.profile.last_active|date:"H:i" }}
+		        {% elif blocked.profile.is_online == 3 %}
+		        {{ blocked.profile.define_sex }} позавчера в {{ blocked.profile.last_active|date:"H:i" }}
+		        {% elif blocked.profile.is_online == 4 %}
+		        {{ blocked.profile.define_sex }} {{ blocked.profile.last_active|date:"j E в H:i" }}
+		        {% elif blocked.profile.is_online == 5 %}
+		        {{ blocked.profile.define_sex }} {{ blocked.profile.last_active|date:"j E y" }}
+		        {% else %}
+		        {{ blocked.profile.is_online }}
+		        {% endif %}
+			</p>
+	        <div class="sub_info">
+	        	{% if blocked.profile.bio %}
+		    	<p class="sub_bio">{{ blocked.profile.bio|truncatechars:60 }}</p>
+		    	{% endif %}
+	        	{% if blocked.profile.city and blocked.profile.bio %}
+		    	<p class="sub_city"><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ blocked.profile.city }}</p>
+		    	{% elif blocked.profile.city %}
+		    	<p class="sub_city" style='margin: 0 0 0 -6px; padding-top: 5px;'><img class="location" src="{% static 'PukPok/img/место.png' %}" alt="">{{ blocked.profile.city }}</p>
+		    	{% endif %}
+		    </div>
+		</div>
+		<br>
+	{% endfor %}
+	{% else %}
+	<p class="no_notifications" style="margin-left: 210px;">Ваш чёрный список пуст!</p>
+	{% endif %}
+</main>
+{% endblock %}
